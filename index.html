@@ -83,15 +83,15 @@
     /* ---------- первый экран: 3D-сцена ---------- */
     .hero { position: relative; min-height: 100svh; display: grid; place-items: center; text-align: center; padding: 120px 0 150px; overflow: hidden; background: radial-gradient(70% 60% at 50% 35%, #1c2420, var(--bg) 70%); }
     .scene { position: absolute; inset: 0; perspective: 1100px; pointer-events: none; }
-    .cube { position: absolute; left: var(--x); top: var(--y); width: var(--s); height: var(--s); transform-style: preserve-3d; transform: rotateX(var(--rx)) rotateY(var(--ry)); animation: drift var(--t) ease-in-out infinite alternate; }
-    .cube i { position: absolute; inset: 0; background: linear-gradient(140deg, #26302b, #0f1311); border: 1px solid rgba(214, 176, 79, .07); }
-    .cube i:nth-child(1) { transform: translateZ(calc(var(--s) / 2)); }
-    .cube i:nth-child(2) { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)); }
-    .cube i:nth-child(3) { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)); background: linear-gradient(150deg, rgba(222, 150, 62, .85), #3a2615 70%); }
-    .cube i:nth-child(4) { transform: rotateY(-90deg) translateZ(calc(var(--s) / 2)); }
-    .cube i:nth-child(5) { transform: rotateX(90deg) translateZ(calc(var(--s) / 2)); background: linear-gradient(200deg, rgba(232, 176, 80, .9), #4a3016 75%); }
-    .cube i:nth-child(6) { transform: rotateX(-90deg) translateZ(calc(var(--s) / 2)); }
-    @keyframes drift { to { transform: rotateX(calc(var(--rx) + 18deg)) rotateY(calc(var(--ry) + 34deg)) translateY(-16px); } }
+    /* пирамида: 4 треугольные грани (высота 0.85 стороны → наклон грани 30.5°) и основание */
+    .pyr { position: absolute; left: var(--x); top: var(--y); width: var(--s); height: var(--s); transform-style: preserve-3d; transform: rotateX(var(--rx)) rotateY(var(--ry)); animation: drift var(--t) ease-in-out infinite alternate; }
+    .pyr i { position: absolute; left: 0; bottom: 50%; width: 100%; height: calc(var(--s) * .986); transform-origin: 50% 100%; clip-path: polygon(50% 0, 100% 100%, 0 100%); background: linear-gradient(170deg, #2a342f, #0f1311 85%); }
+    .pyr i:nth-child(1) { transform: translateZ(calc(var(--s) / 2)) rotateX(30.5deg); background: linear-gradient(165deg, rgba(236, 170, 72, .95), #3e2816 80%); }
+    .pyr i:nth-child(2) { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)) rotateX(30.5deg); background: linear-gradient(190deg, rgba(214, 140, 60, .7), #24180f 80%); }
+    .pyr i:nth-child(3) { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)) rotateX(30.5deg); }
+    .pyr i:nth-child(4) { transform: rotateY(270deg) translateZ(calc(var(--s) / 2)) rotateX(30.5deg); }
+    .pyr b { position: absolute; inset: 0; transform: rotateX(90deg); background: #0d100f; }
+    @keyframes drift { to { transform: rotateX(calc(var(--rx) + 14deg)) rotateY(calc(var(--ry) + 70deg)) translateY(-16px); } }
     .orb { position: absolute; left: 62%; top: 22%; width: clamp(56px, 7vw, 92px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff1c9, #f0b24a 45%, #d0702c 80%); box-shadow: 0 0 60px 20px rgba(240, 170, 70, .35), 0 0 200px 80px rgba(240, 150, 60, .12); animation: glow 5s ease-in-out infinite alternate; }
     @keyframes glow { to { transform: translateY(-10px); box-shadow: 0 0 80px 26px rgba(240, 170, 70, .42), 0 0 240px 100px rgba(240, 150, 60, .14); } }
     .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, var(--bg)); pointer-events: none; }
@@ -111,24 +111,21 @@
     h2 { font: 800 clamp(40px, 7vw, 84px)/1.05 var(--sans); text-align: center; letter-spacing: -.01em; }
     .sub-title { max-width: 34em; margin: 18px auto 0; text-align: center; color: var(--muted); font: 15px/1.7 var(--mono); }
 
-    /* ---------- что я делаю ---------- */
-    .code-bg { position: absolute; left: 50%; bottom: 40px; translate: -30% 0; font: 15px/1.75 var(--mono); color: rgba(236, 228, 212, .06); white-space: pre; pointer-events: none; user-select: none; }
-    .code-bg b { color: rgba(214, 176, 79, .1); font-weight: 400; }
-    .cards { position: relative; display: grid; margin-top: clamp(48px, 7vw, 80px); border: 2px solid var(--frame); }
-    @media (min-width: 900px) { .cards { grid-template-columns: repeat(3, 1fr); } }
-    .card { padding: clamp(30px, 4vw, 48px) clamp(24px, 3vw, 40px) clamp(36px, 4vw, 56px); background: rgba(19, 23, 21, .82); }
-    .card + .card { border-top: 2px solid var(--frame); }
-    @media (min-width: 900px) { .card + .card { border-top: 0; border-left: 2px solid var(--frame); } }
-    .card-head { display: flex; gap: 20px; align-items: flex-start; }
-    .card-head svg { flex: none; width: 46px; height: 46px; color: var(--ink); margin-top: 4px; }
-    .card h3 { font: 800 clamp(22px, 2.1vw, 27px)/1.2 var(--sans); }
-    .card h3 mark { color: inherit; background: linear-gradient(transparent 60%, var(--hl) 60%, var(--hl) 88%, transparent 88%); }
-    .card h3 small { display: block; font-size: .8em; }
-    .tagged { margin-top: 26px; font: 15px/1.75 var(--mono); }
-    .tagged::before, .tagged::after { display: block; color: var(--muted); font-size: 14px; }
-    .tagged::before { content: '<p>'; }
-    .tagged::after { content: '</p>'; }
-    .tagged span { display: block; margin: 8px 0 8px 18px; padding-left: 20px; border-left: 2px solid var(--line); }
+    /* ---------- что я делаю: вращающиеся кольца с надписями ---------- */
+    #skills { overflow: hidden; }
+    .orbit { position: relative; width: min(94vw, 900px); aspect-ratio: 1; margin: 0 auto; }
+    .orbit::before { content: ''; position: absolute; inset: 22%; border-radius: 50%; background: radial-gradient(circle, rgba(47, 122, 90, .22), transparent 70%); }
+    .ring-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; animation: spin var(--t) linear infinite; }
+    .ring-svg.rev { animation-direction: reverse; }
+    .orbit:hover .ring-svg { animation-play-state: paused; }
+    @keyframes spin { to { rotate: 360deg; } }
+    .ring-svg text { font: 800 var(--fs) var(--sans); text-transform: uppercase; fill: var(--c); }
+    .ring-svg text tspan { fill: var(--gold); }
+    .ring-svg circle { fill: none; stroke: var(--line); stroke-width: 1.5; }
+    .orbit-center { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; pointer-events: none; }
+    .orbit-center p { font: 700 clamp(11px, 1.4vw, 14px) var(--mono); color: var(--gold); }
+    .orbit-center h2 { margin-top: 8px; font-size: clamp(26px, 5vw, 56px); line-height: 1.02; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
     /* ---------- мой путь ---------- */
     .path { display: grid; gap: 36px; margin-top: clamp(48px, 7vw, 80px); }
@@ -230,10 +227,9 @@
     .js .reveal.in { opacity: 1; transform: none; }
 
     @media (max-width: 640px) {
-      .cube.c1 { --x: 2% !important; --s: 110px !important; }
-      .cube.c2 { --x: 52% !important; --s: 120px !important; }
+      .pyr.p1 { --x: 2% !important; --s: 120px !important; }
+      .pyr.p2 { --x: 50% !important; --s: 140px !important; }
       .orb { left: 70%; top: 18%; }
-      .code-bg { display: none; }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
@@ -269,10 +265,10 @@
   <main id="top">
     <section class="hero">
       <div class="scene" aria-hidden="true">
-        <div class="cube c1" style="--x:24%;--y:20%;--s:190px;--rx:-24deg;--ry:38deg;--t:14s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <div class="cube c2" style="--x:47%;--y:40%;--s:220px;--rx:-30deg;--ry:-28deg;--t:17s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <div class="cube c3" style="--x:36%;--y:68%;--s:96px;--rx:20deg;--ry:50deg;--t:11s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <div class="cube c4" style="--x:74%;--y:62%;--s:70px;--rx:-12deg;--ry:-40deg;--t:13s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="pyr p1" style="--x:20%;--y:22%;--s:200px;--rx:-14deg;--ry:20deg;--t:16s"><i></i><i></i><i></i><i></i><b></b></div>
+        <div class="pyr p2" style="--x:50%;--y:42%;--s:240px;--rx:-10deg;--ry:-35deg;--t:19s"><i></i><i></i><i></i><i></i><b></b></div>
+        <div class="pyr p3" style="--x:34%;--y:70%;--s:100px;--rx:-18deg;--ry:60deg;--t:12s"><i></i><i></i><i></i><i></i><b></b></div>
+        <div class="pyr p4" style="--x:76%;--y:64%;--s:76px;--rx:-8deg;--ry:-50deg;--t:14s"><i></i><i></i><i></i><i></i><b></b></div>
         <div class="orb"></div>
       </div>
       <div class="hero-text">
@@ -289,39 +285,13 @@
     </section>
 
     <section class="block" id="skills">
-      <pre class="code-bg" aria-hidden="true"><b>const</b> элтегин = {
-  делает: [<b>'сайты'</b>, <b>'автоматизации'</b>, <b>'видео'</b>],
-  стек: [<b>'React'</b>, <b>'Make.com'</b>, <b>'Vercel'</b>],
-  принцип: <b>'довести до работающей ссылки'</b>,
-}
-
-<b>export default</b> элтегин</pre>
-      <div class="wrap">
-        <h2 class="reveal">Что я делаю</h2>
-        <div class="cards reveal">
-          <article class="card" style="--hl: var(--gold-2)">
-            <div class="card-head">
-              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><rect x="4" y="7" width="40" height="27" rx="2"/><path d="M18 41h12M24 34v7M14 41h20"/></svg>
-              <h3><mark>Веб-разработка</mark><small>React, PWA</small></h3>
-            </div>
-            <p class="tagged"><span>Лендинги и веб-приложения: адаптивные, быстрые, с публикацией в интернете на своём домене.</span></p>
-          </article>
-          <article class="card" style="--hl: var(--green)">
-            <div class="card-head">
-              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="9" cy="24" r="5"/><circle cx="39" cy="11" r="5"/><circle cx="39" cy="37" r="5"/><path d="M14 24c10 0 10-13 20-13M14 24c10 0 10 13 20 13"/></svg>
-              <h3><mark>Автоматизация</mark><small>Make.com</small></h3>
-            </div>
-            <p class="tagged"><span>Связываю сервисы, чтобы рутина шла сама: заявка → таблица → письмо → уведомление в Telegram.</span></p>
-          </article>
-          <article class="card" style="--hl: var(--gold-2)">
-            <div class="card-head">
-              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><rect x="12" y="3" width="24" height="42" rx="4"/><path d="M21 18v12l10-6z"/></svg>
-              <h3><mark>Короткие видео</mark><small>Reels, Shorts</small></h3>
-            </div>
-            <p class="tagged"><span>Монтаж роликов для Reels, Shorts и TikTok: нарезка, субтитры, ритм, который удерживает внимание.</span></p>
-          </article>
-        </div>
-      </div>
+      <div class="orbit reveal" id="orbit" aria-hidden="true"></div>
+      <div class="orbit-center"><p>// 02</p><h2>Чем я<br>занимаюсь</h2></div>
+      <ul class="sr-only">
+        <li>Веб-разработка: лендинги и веб-приложения на React, PWA, публикация на своём домене.</li>
+        <li>Автоматизация на Make.com: заявка → таблица → письмо → уведомление в Telegram.</li>
+        <li>Короткие видео: монтаж для Reels, Shorts и TikTok, субтитры.</li>
+      </ul>
     </section>
 
     <section class="block" id="path">
@@ -454,6 +424,22 @@
   <script>
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
     document.getElementById('year').textContent = new Date().getFullYear()
+
+    // ---------- «Чем я занимаюсь»: надписи по окружностям; textLength растягивает текст ровно на круг ----------
+    const RINGS = [
+      { r: 455, fs: 38, c: 'var(--ink)', t: 80, text: 'Веб-разработка • лендинги • веб-приложения • React • PWA • Tailwind • свой домен • ' },
+      { r: 345, fs: 34, c: 'var(--gold)', t: 60, rev: true, text: 'Автоматизация • Make.com • заявка → таблица → письмо → Telegram • ' },
+      { r: 240, fs: 30, c: '#7cc4a0', t: 45, text: 'Короткие видео • Reels • Shorts • TikTok • монтаж • субтитры • ' },
+    ]
+    document.getElementById('orbit').innerHTML = RINGS.map((g, i) => {
+      const len = (2 * Math.PI * g.r).toFixed(0)
+      const words = g.text.split('•').map((w) => w.trim()).filter(Boolean)
+      return `<svg class="ring-svg${g.rev ? ' rev' : ''}" viewBox="0 0 1000 1000" style="--t:${g.t}s;--fs:${g.fs}px;--c:${g.c}">
+        <path id="ring${i}" d="M500 ${500 - g.r}a${g.r} ${g.r} 0 1 1 0 ${2 * g.r}a${g.r} ${g.r} 0 1 1 0 ${-2 * g.r}" fill="none"/>
+        <circle cx="500" cy="500" r="${g.r + g.fs * .85}"/>
+        <text textLength="${len}" lengthAdjust="spacing"><textPath href="#ring${i}">${words.map((w) => `${w} <tspan>•</tspan> `).join('')}</textPath></text>
+      </svg>`
+    }).join('')
 
     // ---------- приветствие: розетка из «кочкор мүйүз» (бараньих рогов) и ромбов-тумаров ----------
     const intro = document.getElementById('intro')
