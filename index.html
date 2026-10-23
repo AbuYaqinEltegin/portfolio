@@ -9,7 +9,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%231f4a38'/><text x='32' y='45' font-size='34' font-weight='800' text-anchor='middle' fill='%23d6b04f' font-family='Arial,sans-serif'>Э</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500&family=Cairo:wght@500;700;800&display=swap" rel="stylesheet" />
   <script>
     // До отрисовки: показывать ли приветствие (один раз за сеанс; ?intro=0 — сразу сайт)
     document.documentElement.classList.add('js')
@@ -17,6 +17,16 @@
       if (sessionStorage.getItem('introSeen') || new URLSearchParams(location.search).get('intro') === '0')
         document.documentElement.classList.add('no-intro')
     } catch (e) {}
+    // Язык: ?lang= → сохранённый выбор → язык браузера → английский
+    window.LANGS = ['ru', 'ky', 'en', 'ar']
+    window.LANG = (() => {
+      const ok = (l) => LANGS.includes(l) && l
+      let saved = null
+      try { saved = localStorage.getItem('lang') } catch (e) {}
+      return ok(new URLSearchParams(location.search).get('lang')) || ok(saved) || ok((navigator.language || '').slice(0, 2)) || 'en'
+    })()
+    document.documentElement.lang = LANG
+    document.documentElement.dir = LANG === 'ar' ? 'rtl' : 'ltr'
   </script>
   <style>
     :root {
@@ -53,12 +63,16 @@
     /* ---------- навигация ---------- */
     .nav { position: fixed; inset: 0 0 auto; z-index: 50; transition: background .3s, backdrop-filter .3s; }
     .nav.scrolled { background: rgba(19, 23, 21, .82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-    .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 92px; transition: height .3s; }
+    .nav .wrap { display: flex; align-items: center; height: 92px; transition: height .3s; }
     .nav.scrolled .wrap { height: 72px; }
     .logo { font: 700 clamp(22px, 3vw, 30px) var(--mono); color: var(--gold); text-decoration: none; letter-spacing: -.02em; }
     .logo i { font-style: normal; color: var(--green); animation: blink 1s steps(1) infinite; }
     @keyframes blink { 50% { opacity: 0; } }
-    .menu { display: flex; gap: clamp(16px, 3vw, 44px); list-style: none; padding: 0; }
+    .menu { display: flex; gap: clamp(16px, 3vw, 44px); list-style: none; padding: 0; margin-inline-start: auto; }
+    .langs { display: flex; gap: 2px; margin-inline-start: clamp(14px, 2.4vw, 32px); padding: 3px; border: 1px solid var(--line); border-radius: 999px; }
+    .langs button { min-width: 40px; min-height: 36px; padding: 0 8px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 700 12px 'JetBrains Mono', monospace; letter-spacing: .04em; cursor: pointer; transition: color .2s, background .2s; }
+    .langs button:hover { color: var(--ink); }
+    .langs button[aria-pressed="true"] { background: var(--gold); color: var(--deep); }
     .menu a { position: relative; display: flex; align-items: center; min-height: 48px; font: 700 18px var(--mono); text-decoration: none; transition: color .2s; }
     .menu a::before { content: '//'; margin-right: .5em; }
     .menu a sup { position: absolute; right: 0; top: 2px; font-size: 10px; color: var(--muted); }
@@ -71,7 +85,10 @@
     .nav.open .burger span::before { transform: translateY(8px) rotate(45deg); }
     .nav.open .burger span::after { transform: translateY(-8px) rotate(-45deg); }
     @media (max-width: 820px) {
-      .burger { display: block; }
+      .burger { display: block; margin-inline-start: 4px; }
+      .logo { font-size: 20px; }
+      .langs { margin-inline-start: auto; }
+      .langs button { min-width: 34px; padding: 0 4px; }
       .menu { position: fixed; inset: 72px 0 auto; flex-direction: column; gap: 0; padding: 12px 16px 28px; background: var(--bg); border-bottom: 1px solid var(--line); display: none; }
       .nav.open { background: var(--bg); }
       .nav.open .menu { display: flex; }
@@ -234,6 +251,31 @@
     .js .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s ease; }
     .js .reveal.in { opacity: 1; transform: none; }
 
+    /* ---------- арабский: шрифт Cairo, без разрядки (она рвёт связность букв), зеркальная раскладка ---------- */
+    /* в моноширинных шрифтах арабских букв нет, а системный запасной растягивает слова — Cairo и там */
+    html[lang="ar"] { --sans: Cairo, system-ui, sans-serif; --mono: Cairo, 'JetBrains Mono', sans-serif; }
+    html[lang="ar"] body { font-family: Cairo, system-ui, sans-serif; }
+    html[lang="ar"] * { letter-spacing: 0 !important; }
+    html[lang="ar"] .hero h1 { line-height: 1.25; }
+    [dir="rtl"] .menu a::before { margin: 0 0 0 .5em; }
+    [dir="rtl"] .menu a sup, [dir="rtl"] .tab sup { right: auto; left: 0; }
+    [dir="rtl"] .tab { padding: 8px 0 8px 26px; text-align: right; }
+    [dir="rtl"] .list li { padding: 0 26px 0 0; }
+    [dir="rtl"] .list li::before { left: auto; right: 0; content: '←'; }
+    [dir="rtl"] .term li { padding: 0 22px 0 0; }
+    [dir="rtl"] .term li::before { left: auto; right: 0; content: '◂'; }
+    [dir="rtl"] .contact-left h2 { text-align: right; }
+    [dir="rtl"] .tile svg { left: auto; right: clamp(22px, 3vw, 40px); }
+    [dir="rtl"] .tile::after { right: auto; left: clamp(20px, 3vw, 36px); content: '↖'; }
+    [dir="rtl"] .work-cap .wip::before { margin: 0 0 0 8px; }
+    @media (max-width: 820px) { [dir="rtl"] .menu a sup { left: auto; right: 0; } }
+    @media (min-width: 720px) { [dir="rtl"] .contact-left { padding-right: max(48px, calc((100vw - 1240px) / 2 + 48px)); padding-left: 64px; } }
+    @media (min-width: 900px) {
+      [dir="rtl"] .tab { padding: 18px 26px 18px 0; border-left: 0; border-right: 2px solid var(--line); }
+      [dir="rtl"] .tab sup { left: auto; right: 26px; }
+      [dir="rtl"] .tab[aria-selected="true"] { border-right-color: var(--gold); }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       *, *::before, *::after { animation: none !important; }
@@ -242,26 +284,29 @@
   </style>
 </head>
 <body>
-  <div class="intro" id="intro" role="dialog" aria-label="Приветствие">
+  <div class="intro" id="intro" role="dialog" aria-label="Приветствие" data-i-label="introLabel">
     <div class="stage">
       <div id="intro-orn"></div>
-      <p>Добро пожаловать.<span>Давайте сделаем что-то вместе</span></p>
+      <p data-i="intro">Добро пожаловать.<span>Давайте сделаем что-то вместе</span></p>
     </div>
-    <button class="skip" id="skip" type="button">пропустить →</button>
+    <button class="skip" id="skip" type="button" data-i="skip">пропустить →</button>
   </div>
 
   <div class="cursor" id="cursor" aria-hidden="true"></div>
 
   <header class="nav" id="nav">
     <div class="wrap">
-      <a class="logo" href="#top">Элтегин.<i>_</i></a>
-      <button class="burger" id="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="menu"><span></span></button>
+      <a class="logo" href="#top"><span data-i="name">Элтегин</span>.<i>_</i></a>
       <ul class="menu" id="menu">
-        <li><a href="#top">главная<sup>01</sup></a></li>
-        <li><a href="#skills">навыки<sup>02</sup></a></li>
-        <li><a href="#path">путь<sup>03</sup></a></li>
-        <li><a href="#contact">связь<sup>04</sup></a></li>
+        <li><a href="#top"><span data-i="mHome">главная</span><sup>01</sup></a></li>
+        <li><a href="#skills"><span data-i="mSkills">навыки</span><sup>02</sup></a></li>
+        <li><a href="#path"><span data-i="mPath">путь</span><sup>03</sup></a></li>
+        <li><a href="#contact"><span data-i="mContact">связь</span><sup>04</sup></a></li>
       </ul>
+      <div class="langs" role="group" aria-label="Язык / Language" id="langs">
+        <button type="button" data-lang="ru" lang="ru">RU</button><button type="button" data-lang="ky" lang="ky">KY</button><button type="button" data-lang="en" lang="en">EN</button><button type="button" data-lang="ar" lang="ar">AR</button>
+      </div>
+      <button class="burger" id="burger" type="button" aria-label="Меню" data-i-label="menu" aria-expanded="false" aria-controls="menu"><span></span></button>
     </div>
   </header>
 
@@ -283,10 +328,10 @@
         <g class="riders" id="riders"></g>
       </svg>
       <div class="hero-text">
-        <h1>Элтегин</h1>
-        <p class="roles">Веб-разработка<b>,</b> автоматизация <b>&amp;</b> короткие видео<b>.</b></p>
+        <h1 data-i="name">Элтегин</h1>
+        <p class="roles" data-i="roles">Веб-разработка<b>,</b> автоматизация <b>&amp;</b> короткие видео<b>.</b></p>
       </div>
-      <a class="mouse" href="#skills" aria-label="Листать вниз"><span>↓</span></a>
+      <a class="mouse" href="#skills" aria-label="Листать вниз" data-i-label="scroll"><span>↓</span></a>
     </section>
 
     <section class="block" id="skills">
@@ -296,59 +341,59 @@
           <article class="dot" style="--a: 0deg">
             <div class="face" style="--c: var(--gold); --t: var(--deep)">
               <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"><rect x="4" y="7" width="40" height="27" rx="2"/><path d="M14 41h20M24 34v7"/></svg>
-              <h3>Веб-разработка</h3>
-              <p>Лендинги и веб-приложения: React, PWA</p>
+              <h3 data-i="s1h">Веб-разработка</h3>
+              <p data-i="s1p">Лендинги и веб-приложения: React, PWA</p>
             </div>
           </article>
           <article class="dot" style="--a: 120deg">
             <div class="face" style="--c: var(--green); --t: var(--ink)">
               <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="9" cy="24" r="5"/><circle cx="39" cy="11" r="5"/><circle cx="39" cy="37" r="5"/><path d="M14 24c10 0 10-13 20-13M14 24c10 0 10 13 20 13"/></svg>
-              <h3>Автоматизация</h3>
-              <p>Make.com: заявки, таблицы, письма, Telegram</p>
+              <h3 data-i="s2h">Автоматизация</h3>
+              <p data-i="s2p">Make.com: заявки, таблицы, письма, Telegram</p>
             </div>
           </article>
           <article class="dot" style="--a: 240deg">
             <div class="face" style="--c: #e6dcc6; --t: var(--deep)">
               <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"><rect x="12" y="3" width="24" height="42" rx="4"/><path d="M21 18v12l10-6z"/></svg>
-              <h3>Короткие видео</h3>
-              <p>Монтаж Reels, Shorts и TikTok, субтитры</p>
+              <h3 data-i="s3h">Короткие видео</h3>
+              <p data-i="s3p">Монтаж Reels, Shorts и TikTok, субтитры</p>
             </div>
           </article>
         </div>
-        <div class="tri-center"><p>// 02</p><h2>Чем я<br>занимаюсь</h2></div>
+        <div class="tri-center"><p>// 02</p><h2 data-i="skillsTitle">Чем я<br>занимаюсь</h2></div>
       </div>
     </section>
 
     <section class="block" id="path">
       <div class="wrap">
-        <h2 class="reveal">Мой путь</h2>
-        <p class="sub-title reveal">// готовые проекты, текущая работа и то, что сейчас изучаю</p>
+        <h2 class="reveal" data-i="pathTitle">Мой путь</h2>
+        <p class="sub-title reveal" data-i="pathSub">// готовые проекты, текущая работа и то, что сейчас изучаю</p>
 
         <div class="path reveal">
-          <div class="tabs" role="tablist" aria-label="Мой путь">
-            <button class="tab" role="tab" id="t-kalima" aria-controls="p-kalima" aria-selected="true">Калима<sup>01</sup><small>веб-приложение</small></button>
-            <button class="tab" role="tab" id="t-kokjol" aria-controls="p-kokjol" aria-selected="false" tabindex="-1">Көк Жол<sup>02</sup><small>в работе</small></button>
-            <button class="tab" role="tab" id="t-study" aria-controls="p-study" aria-selected="false" tabindex="-1">Учёба<sup>03</sup><small>сейчас</small></button>
+          <div class="tabs" role="tablist" aria-label="Мой путь" data-i-label="pathTitle">
+            <button class="tab" role="tab" id="t-kalima" aria-controls="p-kalima" aria-selected="true"><span data-i="kalima">Калима</span><sup>01</sup><small data-i="tab1">веб-приложение</small></button>
+            <button class="tab" role="tab" id="t-kokjol" aria-controls="p-kokjol" aria-selected="false" tabindex="-1"><span data-i="kokjol">Көк Жол</span><sup>02</sup><small data-i="tab2">в работе</small></button>
+            <button class="tab" role="tab" id="t-study" aria-controls="p-study" aria-selected="false" tabindex="-1"><span data-i="study">Учёба</span><sup>03</sup><small data-i="tab3">сейчас</small></button>
           </div>
 
           <div>
             <article class="panel" role="tabpanel" id="p-kalima" aria-labelledby="t-kalima" tabindex="0">
               <a class="work" href="https://kalima-seven.vercel.app" target="_blank" rel="noopener">
-                <div class="work-img"><img src="img/kalima.png" alt="Главная страница Калимы" loading="lazy" width="1280" height="800"></div>
-                <div class="work-cap"><h3>Калима — арабские слова</h3><p>Веб-приложение · октябрь 2026</p></div>
+                <div class="work-img"><img src="img/kalima.png" alt="Главная страница Калимы" data-i-alt="kalAlt" loading="lazy" width="1280" height="800"></div>
+                <div class="work-cap"><h3 data-i="kalCap">Калима — арабские слова</h3><p data-i="kalDate">Веб-приложение · октябрь 2026</p></div>
               </a>
               <div class="about">
-                <p>Карточки для изучения арабской лексики. Приложение само планирует, какие слова пора повторить, чтобы они не забывались.</p>
+                <p data-i="kalAbout">Карточки для изучения арабской лексики. Приложение само планирует, какие слова пора повторить, чтобы они не забывались.</p>
                 <ul class="list">
-                  <li><b>18 тем, 390 слов</b> <span>— с огласовками, транслитерацией и переводом</span></li>
-                  <li><b>Озвучка</b> <span>— слово звучит при перевороте карточки</span></li>
-                  <li><b>Интервальное повторение</b> <span>— алгоритм SM-2, тест и статистика</span></li>
-                  <li><b>PWA</b> <span>— ставится на телефон, работает без интернета</span></li>
+                  <li data-i="kalL1"><b>18 тем, 390 слов</b> <span>— с огласовками, транслитерацией и переводом</span></li>
+                  <li data-i="kalL2"><b>Озвучка</b> <span>— слово звучит при перевороте карточки</span></li>
+                  <li data-i="kalL3"><b>Интервальное повторение</b> <span>— алгоритм SM-2, тест и статистика</span></li>
+                  <li data-i="kalL4"><b>PWA</b> <span>— ставится на телефон, работает без интернета</span></li>
                 </ul>
                 <div class="chips"><span>React</span><span>Vite</span><span>Tailwind</span><span>PWA</span><span>Vercel</span></div>
                 <div class="btns">
-                  <a class="btn solid" href="https://kalima-seven.vercel.app" target="_blank" rel="noopener">Открыть сайт ↗</a>
-                  <a class="btn" href="https://github.com/AbuYaqinEltegin/kalima" target="_blank" rel="noopener">Код на GitHub</a>
+                  <a class="btn solid" href="https://kalima-seven.vercel.app" target="_blank" rel="noopener" data-i="openSite">Открыть сайт ↗</a>
+                  <a class="btn" href="https://github.com/AbuYaqinEltegin/kalima" target="_blank" rel="noopener" data-i="codeGh">Код на GitHub</a>
                 </div>
               </div>
             </article>
@@ -370,33 +415,33 @@
                     <path d="M330 380C330 330 260 320 300 290S410 270 380 250" fill="none" stroke="#d6b04f" stroke-width="3" stroke-dasharray="10 10"/>
                   </svg>
                 </div>
-                <div class="work-cap"><h3>Көк Жол — тур-агентство</h3><p class="wip">В работе · с октября 2026</p></div>
+                <div class="work-cap"><h3 data-i="kokCap">Көк Жол — тур-агентство</h3><p class="wip" data-i="kokDate">В работе · с октября 2026</p></div>
               </div>
               <div class="about">
-                <p>Демо-проект тур-агентства по Кыргызстану. Задача — показать «бизнес в коробке»: сайт плюс автоматизация всей рутины агентства.</p>
-                <p class="label">// что будет</p>
+                <p data-i="kokAbout">Демо-проект тур-агентства по Кыргызстану. Задача — показать «бизнес в коробке»: сайт плюс автоматизация всей рутины агентства.</p>
+                <p class="label" data-i="kokWhat">// что будет</p>
                 <ul class="list">
-                  <li><b>Сайт RU / EN</b> <span>— каталог и страницы туров, конструктор маршрута, бронирование, админ-панель</span></li>
-                  <li><b>ИИ-помощник</b> <span>— подбирает тур по пожеланиям посетителя</span></li>
-                  <li><b>Make.com</b> <span>— заявка → CRM в Google Sheets → письмо клиенту → уведомление менеджеру в Telegram с кнопкой «подтвердить»; напоминания перед поездкой, отзыв после тура, еженедельный отчёт владельцу</span></li>
+                  <li data-i="kokL1"><b>Сайт RU / EN</b> <span>— каталог и страницы туров, конструктор маршрута, бронирование, админ-панель</span></li>
+                  <li data-i="kokL2"><b>ИИ-помощник</b> <span>— подбирает тур по пожеланиям посетителя</span></li>
+                  <li data-i="kokL3"><b>Make.com</b> <span>— заявка → CRM в Google Sheets → письмо клиенту → уведомление менеджеру в Telegram с кнопкой «подтвердить»; напоминания перед поездкой, отзыв после тура, еженедельный отчёт владельцу</span></li>
                 </ul>
-                <p class="label">// статус</p>
-                <ul class="steps"><li class="ok">концепция</li><li class="ok">план</li><li class="ok">макет дизайна</li><li class="now">разработка сайта</li><li>автоматизации</li></ul>
-                <p class="label">// стек</p>
-                <div class="chips"><span>Next.js</span><span>Tailwind</span><span>база данных</span><span>Vercel</span><span>Make.com</span></div>
+                <p class="label" data-i="kokStatus">// статус</p>
+                <ul class="steps" data-i="kokSteps"><li class="ok">концепция</li><li class="ok">план</li><li class="ok">макет дизайна</li><li class="now">разработка сайта</li><li>автоматизации</li></ul>
+                <p class="label" data-i="kokStack">// стек</p>
+                <div class="chips"><span>Next.js</span><span>Tailwind</span><span data-i="db">база данных</span><span>Vercel</span><span>Make.com</span></div>
               </div>
             </article>
 
             <article class="panel" role="tabpanel" id="p-study" aria-labelledby="t-study" tabindex="0" hidden>
               <div class="term">
-                <div class="term-bar"><i></i><i></i><i></i><em>~/учёба — октябрь 2026</em></div>
+                <div class="term-bar"><i></i><i></i><i></i><em data-i="termTitle">~/учёба — октябрь 2026</em></div>
                 <div class="term-body">
-                  <p class="cmd"><b>$</b> изучаю --сейчас</p>
+                  <p class="cmd"><b>$</b> <span data-i="termCmd">изучаю --сейчас</span></p>
                   <ul>
-                    <li><b>Claude Code</b><span>Разработка вместе с ИИ-агентом: планирование, CLAUDE.md, git, деплой на Vercel. На нём сделаны Калима и этот сайт.</span></li>
-                    <li><b>Make.com</b><span>Сценарии автоматизации: Google Sheets → Gmail, фильтры, подключение Telegram-бота.</span></li>
-                    <li><b>Веб-разработка</b><span>React, Tailwind, PWA, GitHub — на практике, в реальных проектах.</span></li>
-                    <li><b>Арабский язык</b><span>Пригодился в Калиме: проверка огласовок и подбор слов.</span></li>
+                    <li data-i="st1"><b>Claude Code</b><span>Разработка вместе с ИИ-агентом: планирование, CLAUDE.md, git, деплой на Vercel. На нём сделаны Калима и этот сайт.</span></li>
+                    <li data-i="st2"><b>Make.com</b><span>Сценарии автоматизации: Google Sheets → Gmail, фильтры, подключение Telegram-бота.</span></li>
+                    <li data-i="st3"><b>Веб-разработка</b><span>React, Tailwind, PWA, GitHub — на практике, в реальных проектах.</span></li>
+                    <li data-i="st4"><b>Арабский язык</b><span>Пригодился в Калиме: проверка огласовок и подбор слов.</span></li>
                   </ul>
                   <p class="cmd"><b>$</b> <span class="caret"></span></p>
                 </div>
@@ -409,8 +454,8 @@
 
     <section class="contact" id="contact">
       <div class="contact-left">
-        <h2 class="reveal">Давайте сделаем что-то вместе</h2>
-        <p class="reveal">Есть задача или идея? Напишите на почту или в мессенджер — обсудим, как её решить.</p>
+        <h2 class="reveal" data-i="contactTitle">Давайте сделаем что-то вместе</h2>
+        <p class="reveal" data-i="contactText">Есть задача или идея? Напишите на почту или в мессенджер — обсудим, как её решить.</p>
         <a class="mail reveal" href="mailto:eltegin.zyrgalbek@gmail.com">eltegin.zyrgalbek@gmail.com</a>
         <ul class="socials reveal">
           <li><a href="https://t.me/abu_yaqin" target="_blank" rel="noopener">Telegram</a></li>
@@ -441,14 +486,100 @@
   </main>
 
   <footer>
-    <div class="wrap"><span>© <span id="year"></span> Элтегин</span><span>сделано с Claude Code · Vercel</span></div>
+    <div class="wrap"><span>© <span id="year"></span> <span data-i="name">Элтегин</span></span><span data-i="made">сделано с Claude Code · Vercel</span></div>
   </footer>
 
-  <a class="to-top" id="to-top" href="#top" aria-label="Наверх">↑</a>
+  <a class="to-top" id="to-top" href="#top" aria-label="Наверх" data-i-label="toTop">↑</a>
 
   <script>
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
     document.getElementById('year').textContent = new Date().getFullYear()
+
+    // ---------- переводы: ключ → [ru, ky, en, ar]; строки свои, поэтому вставляются как HTML ----------
+    const I18N = {
+      title: ['Элтегин — проекты', 'Элтегин — долбоорлор', 'Eltegin — projects', 'إلتيغين — المشاريع'],
+      introLabel: ['Приветствие', 'Саламдашуу', 'Welcome', 'ترحيب'],
+      intro: ['Добро пожаловать.<span>Давайте сделаем что-то вместе</span>', 'Кош келиңиз.<span>Келиңиз, чогуу бир нерсе жасайлы</span>', 'Welcome.<span>Let’s build something together</span>', 'أهلًا وسهلًا.<span>لنصنع شيئًا معًا</span>'],
+      skip: ['пропустить →', 'өткөрүү →', 'skip →', 'تخطٍّ ←'],
+      name: ['Элтегин', 'Элтегин', 'Eltegin', 'إلتيغين'],
+      menu: ['Меню', 'Меню', 'Menu', 'القائمة'],
+      mHome: ['главная', 'башкы', 'home', 'الرئيسية'],
+      mSkills: ['навыки', 'көндүмдөр', 'skills', 'المهارات'],
+      mPath: ['путь', 'жол', 'path', 'المسار'],
+      mContact: ['связь', 'байланыш', 'contact', 'تواصل'],
+      roles: ['Веб-разработка<b>,</b> автоматизация <b>&amp;</b> короткие видео<b>.</b>', 'Веб-иштеп чыгуу<b>,</b> автоматташтыруу <b>&amp;</b> кыска видеолор<b>.</b>', 'Web development<b>,</b> automation <b>&amp;</b> short videos<b>.</b>', 'تطوير الويب<b>،</b> الأتمتة <b>و</b>الفيديوهات القصيرة<b>.</b>'],
+      scroll: ['Листать вниз', 'Ылдый түшүү', 'Scroll down', 'مرّر للأسفل'],
+      s1h: ['Веб-разработка', 'Веб-иштеп чыгуу', 'Web development', 'تطوير الويب'],
+      s1p: ['Лендинги и веб-приложения: React, PWA', 'Лендингдер жана веб-тиркемелер: React, PWA', 'Landing pages and web apps: React, PWA', 'صفحات هبوط وتطبيقات ويب: React وPWA'],
+      s2h: ['Автоматизация', 'Автомат&shy;таштыруу', 'Automation', 'الأتمتة'],
+      s2p: ['Make.com: заявки, таблицы, письма, Telegram', 'Make.com: өтүнмөлөр, таблицалар, каттар, Telegram', 'Make.com: leads, sheets, emails, Telegram', 'Make.com: الطلبات والجداول والرسائل وTelegram'],
+      s3h: ['Короткие видео', 'Кыска видеолор', 'Short videos', 'فيديوهات قصيرة'],
+      s3p: ['Монтаж Reels, Shorts и TikTok, субтитры', 'Reels, Shorts жана TikTok монтажы, субтитрлер', 'Editing Reels, Shorts and TikTok, subtitles', 'مونتاج Reels وShorts وTikTok مع الترجمة النصية'],
+      skillsTitle: ['Чем я<br>занимаюсь', 'Мен эмне<br>менен<br>алектенем', 'What<br>I do', 'ماذا<br>أفعل'],
+      pathTitle: ['Мой путь', 'Менин жолум', 'My path', 'مساري'],
+      pathSub: ['// готовые проекты, текущая работа и то, что сейчас изучаю', '// даяр долбоорлор, азыркы иш жана азыр эмнени үйрөнүп жатканым', '// finished projects, current work and what I’m learning now', '// مشاريع منجزة، وعمل حالي، وما أتعلّمه الآن'],
+      kalima: ['Калима', 'Калима', 'Kalima', 'كلمة'],
+      kokjol: ['Көк Жол', 'Көк Жол', 'Kök Jol', 'كوك جول'],
+      study: ['Учёба', 'Окуу', 'Learning', 'التعلّم'],
+      tab1: ['веб-приложение', 'веб-тиркеме', 'web app', 'تطبيق ويب'],
+      tab2: ['в работе', 'иштелүүдө', 'in progress', 'قيد العمل'],
+      tab3: ['сейчас', 'азыр', 'now', 'الآن'],
+      kalAlt: ['Главная страница Калимы', 'Калиманын башкы барагы', 'Kalima home page', 'الصفحة الرئيسية لتطبيق كلمة'],
+      kalCap: ['Калима — арабские слова', 'Калима — арабча сөздөр', 'Kalima — Arabic words', 'كلمة — مفردات عربية'],
+      kalDate: ['Веб-приложение · октябрь 2026', 'Веб-тиркеме · 2026-жыл, октябрь', 'Web app · October 2026', 'تطبيق ويب · أكتوبر 2026'],
+      kalAbout: ['Карточки для изучения арабской лексики. Приложение само планирует, какие слова пора повторить, чтобы они не забывались.', 'Араб лексикасын үйрөнүү үчүн карточкалар. Сөздөр унутулбашы үчүн тиркеме аларды качан кайталоону өзү пландайт.', 'Flashcards for learning Arabic vocabulary. The app plans which words are due for review, so they don’t get forgotten.', 'بطاقات لتعلّم المفردات العربية. يخطّط التطبيق بنفسه موعد مراجعة كل كلمة كي لا تُنسى.'],
+      kalL1: ['<b>18 тем, 390 слов</b> <span>— с огласовками, транслитерацией и переводом</span>', '<b>18 тема, 390 сөз</b> <span>— харакаттары, транслитерациясы жана котормосу менен</span>', '<b>18 topics, 390 words</b> <span>— with vowel marks, transliteration and translation</span>', '<b>18 موضوعًا، 390 كلمة</b> <span>— بالتشكيل والنقحرة والترجمة</span>'],
+      kalL2: ['<b>Озвучка</b> <span>— слово звучит при перевороте карточки</span>', '<b>Үн</b> <span>— карточка оодарылганда сөз айтылат</span>', '<b>Audio</b> <span>— the word is spoken when the card flips</span>', '<b>النطق الصوتي</b> <span>— تُنطق الكلمة عند قلب البطاقة</span>'],
+      kalL3: ['<b>Интервальное повторение</b> <span>— алгоритм SM-2, тест и статистика</span>', '<b>Аралыктуу кайталоо</b> <span>— SM-2 алгоритми, тест жана статистика</span>', '<b>Spaced repetition</b> <span>— SM-2 algorithm, quiz and stats</span>', '<b>التكرار المتباعد</b> <span>— خوارزمية SM-2، واختبار وإحصاءات</span>'],
+      kalL4: ['<b>PWA</b> <span>— ставится на телефон, работает без интернета</span>', '<b>PWA</b> <span>— телефонго орнотулат, интернетсиз иштейт</span>', '<b>PWA</b> <span>— installs on a phone, works offline</span>', '<b>PWA</b> <span>— يُثبَّت على الهاتف ويعمل دون إنترنت</span>'],
+      openSite: ['Открыть сайт ↗', 'Сайтты ачуу ↗', 'Open site ↗', 'افتح الموقع ↗'],
+      codeGh: ['Код на GitHub', 'GitHub’тагы код', 'Code on GitHub', 'الكود على GitHub'],
+      kokCap: ['Көк Жол — тур-агентство', 'Көк Жол — туристтик агенттик', 'Kök Jol — travel agency', 'كوك جول — وكالة سياحية'],
+      kokDate: ['В работе · с октября 2026', 'Иштелүүдө · 2026-жылдын октябрынан бери', 'In progress · since October 2026', 'قيد العمل · منذ أكتوبر 2026'],
+      kokAbout: ['Демо-проект тур-агентства по Кыргызстану. Задача — показать «бизнес в коробке»: сайт плюс автоматизация всей рутины агентства.', 'Кыргызстан боюнча туристтик агенттиктин демо-долбоору. Максат — «кутудагы бизнести» көрсөтүү: сайт жана агенттиктин бардык күнүмдүк иштерин автоматташтыруу.', 'A demo project for a travel agency in Kyrgyzstan. The goal is to show a “business in a box”: a website plus automation of all the agency’s routine.', 'مشروع تجريبي لوكالة سياحية في قيرغيزستان. الهدف عرض «عمل جاهز في صندوق»: موقع إلكتروني مع أتمتة كل المهام الروتينية للوكالة.'],
+      kokWhat: ['// что будет', '// эмне болот', '// what’s planned', '// ما المخطط له'],
+      kokL1: ['<b>Сайт RU / EN</b> <span>— каталог и страницы туров, конструктор маршрута, бронирование, админ-панель</span>', '<b>Сайт RU / EN</b> <span>— турлардын каталогу жана барактары, маршрут түзүүчү, брондоо, админ-панель</span>', '<b>RU / EN website</b> <span>— tour catalog and pages, route builder, booking, admin panel</span>', '<b>موقع بالروسية والإنجليزية</b> <span>— كتالوج الجولات وصفحاتها، ومُنشئ المسار، والحجز، ولوحة الإدارة</span>'],
+      kokL2: ['<b>ИИ-помощник</b> <span>— подбирает тур по пожеланиям посетителя</span>', '<b>ЖИ-жардамчы</b> <span>— келүүчүнүн каалоосуна жараша тур тандайт</span>', '<b>AI assistant</b> <span>— picks a tour based on the visitor’s wishes</span>', '<b>مساعد ذكي</b> <span>— يختار الجولة حسب رغبات الزائر</span>'],
+      kokL3: ['<b>Make.com</b> <span>— заявка → CRM в Google Sheets → письмо клиенту → уведомление менеджеру в Telegram с кнопкой «подтвердить»; напоминания перед поездкой, отзыв после тура, еженедельный отчёт владельцу</span>', '<b>Make.com</b> <span>— өтүнмө → Google Sheets’теги CRM → кардарга кат → менеджерге Telegram’да «ырастоо» баскычы менен билдирүү; сапар алдында эскертмелер, турдан кийин пикир, ээсине жумалык отчёт</span>', '<b>Make.com</b> <span>— lead → CRM in Google Sheets → email to the client → Telegram alert to the manager with a “confirm” button; pre-trip reminders, post-tour reviews, a weekly report to the owner</span>', '<b>Make.com</b> <span>— طلب ← CRM في Google Sheets ← رسالة إلى العميل ← إشعار للمدير في Telegram مع زر «تأكيد»؛ تذكيرات قبل الرحلة، وطلب تقييم بعد الجولة، وتقرير أسبوعي للمالك</span>'],
+      kokStatus: ['// статус', '// абалы', '// status', '// الحالة'],
+      kokSteps: [
+        '<li class="ok">концепция</li><li class="ok">план</li><li class="ok">макет дизайна</li><li class="now">разработка сайта</li><li>автоматизации</li>',
+        '<li class="ok">концепция</li><li class="ok">план</li><li class="ok">дизайн макети</li><li class="now">сайтты иштеп чыгуу</li><li>автоматташтыруу</li>',
+        '<li class="ok">concept</li><li class="ok">plan</li><li class="ok">design mockup</li><li class="now">site development</li><li>automations</li>',
+        '<li class="ok">الفكرة</li><li class="ok">الخطة</li><li class="ok">نموذج التصميم</li><li class="now">تطوير الموقع</li><li>الأتمتة</li>'],
+      kokStack: ['// стек', '// стек', '// stack', '// التقنيات'],
+      db: ['база данных', 'маалымат базасы', 'database', 'قاعدة بيانات'],
+      termTitle: ['~/учёба — октябрь 2026', '~/окуу — 2026-жыл, октябрь', '~/learning — October 2026', '~/التعلّم — أكتوبر 2026'],
+      termCmd: ['изучаю --сейчас', 'үйрөнүп жатам --азыр', 'learning --now', 'أتعلّم --الآن'],
+      st1: ['<b>Claude Code</b><span>Разработка вместе с ИИ-агентом: планирование, CLAUDE.md, git, деплой на Vercel. На нём сделаны Калима и этот сайт.</span>', '<b>Claude Code</b><span>ЖИ-агент менен бирге иштеп чыгуу: пландоо, CLAUDE.md, git, Vercel’ге жайгаштыруу. Калима жана бул сайт ушул аркылуу жасалган.</span>', '<b>Claude Code</b><span>Building with an AI agent: planning, CLAUDE.md, git, deploying to Vercel. Kalima and this site were made with it.</span>', '<b>Claude Code</b><span>التطوير مع وكيل ذكاء اصطناعي: التخطيط، وCLAUDE.md، وgit، والنشر على Vercel. به صُنع تطبيق كلمة وهذا الموقع.</span>'],
+      st2: ['<b>Make.com</b><span>Сценарии автоматизации: Google Sheets → Gmail, фильтры, подключение Telegram-бота.</span>', '<b>Make.com</b><span>Автоматташтыруу сценарийлери: Google Sheets → Gmail, чыпкалар, Telegram-ботту туташтыруу.</span>', '<b>Make.com</b><span>Automation scenarios: Google Sheets → Gmail, filters, connecting a Telegram bot.</span>', '<b>Make.com</b><span>سيناريوهات الأتمتة: Google Sheets ← Gmail، والمرشّحات، وربط بوت Telegram.</span>'],
+      st3: ['<b>Веб-разработка</b><span>React, Tailwind, PWA, GitHub — на практике, в реальных проектах.</span>', '<b>Веб-иштеп чыгуу</b><span>React, Tailwind, PWA, GitHub — практикада, чыныгы долбоорлордо.</span>', '<b>Web development</b><span>React, Tailwind, PWA, GitHub — hands-on, in real projects.</span>', '<b>تطوير الويب</b><span>React وTailwind وPWA وGitHub — عمليًّا في مشاريع حقيقية.</span>'],
+      st4: ['<b>Арабский язык</b><span>Пригодился в Калиме: проверка огласовок и подбор слов.</span>', '<b>Араб тили</b><span>Калимада керек болду: харакаттарды текшерүү жана сөздөрдү тандоо.</span>', '<b>Arabic</b><span>Came in handy for Kalima: checking vowel marks and choosing words.</span>', '<b>اللغة العربية</b><span>أفادتني في تطبيق كلمة: مراجعة التشكيل واختيار الكلمات.</span>'],
+      contactTitle: ['Давайте сделаем что-то вместе', 'Келиңиз, чогуу бир нерсе жасайлы', 'Let’s build something together', 'لنصنع شيئًا معًا'],
+      contactText: ['Есть задача или идея? Напишите на почту или в мессенджер — обсудим, как её решить.', 'Тапшырма же идея барбы? Почтага же мессенджерге жазыңыз — аны кантип ишке ашырууну талкуулайбыз.', 'Have a task or an idea? Write to me by email or messenger — let’s discuss how to make it happen.', 'لديك مهمة أو فكرة؟ راسلني عبر البريد أو تطبيقات المراسلة، ولنناقش كيف ننفّذها.'],
+      made: ['сделано с Claude Code · Vercel', 'Claude Code · Vercel менен жасалды', 'made with Claude Code · Vercel', 'صُنع باستخدام Claude Code · Vercel'],
+      toTop: ['Наверх', 'Жогору', 'Back to top', 'إلى الأعلى'],
+    }
+
+    const setLang = (lang) => {
+      const i = LANGS.indexOf(lang)
+      const t = (key) => I18N[key][i]
+      document.documentElement.lang = lang
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
+      document.title = t('title')
+      document.querySelectorAll('[data-i]').forEach((el) => (el.innerHTML = t(el.dataset.i)))
+      document.querySelectorAll('[data-i-label]').forEach((el) => el.setAttribute('aria-label', t(el.dataset.iLabel)))
+      document.querySelectorAll('[data-i-alt]').forEach((el) => (el.alt = t(el.dataset.iAlt)))
+      document.querySelectorAll('[data-lang]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.lang === lang))
+    }
+    setLang(LANG)
+    // запоминаем только явный выбор, а не язык, угаданный по браузеру
+    document.getElementById('langs').onclick = (e) => {
+      const b = e.target.closest('[data-lang]')
+      if (!b) return
+      setLang(b.dataset.lang)
+      try { localStorage.setItem('lang', b.dataset.lang) } catch (e) {}
+    }
 
     // ---------- степь: трава (узор повторяется каждые 400 единиц — так бег зациклен без шва) ----------
     let grass = ''
