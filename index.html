@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Элтегин — проекты</title>
+  <meta name="description" content="Портфолио Элтегина: веб-приложения и сайты." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%231f4a38'/><text x='32' y='44' font-size='34' text-anchor='middle' fill='%23c9a23a' font-family='Georgia,serif'>Э</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f3ece0; --surface: #faf5ec; --ink: #1d2a24; --muted: #6b6a60;
+      --line: #ddd2bf; --gold: #9c7a22; --forest: #1f4a38; --forest-ink: #f3ece0;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #121a16; --surface: #18231e; --ink: #ece4d4; --muted: #9a9686; --line: #2c3a33; --gold: #d2ae4f; --forest: #1f4a38; }
+    }
+    * { box-sizing: border-box; margin: 0; }
+    body { background: var(--bg); color: var(--ink); font: 16px/1.6 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px; }
+
+    header { padding: 72px 0 56px; border-bottom: 1px solid var(--line); }
+    .eyebrow { font-size: 12px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); }
+    h1 { font: 600 clamp(44px, 8vw, 72px)/1.02 'Cormorant Garamond', Georgia, serif; margin-top: 12px; }
+    .lead { max-width: 560px; margin-top: 16px; color: var(--muted); font-size: 18px; }
+    .contacts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); text-decoration: none; font-size: 14px; transition: border-color .2s, transform .2s; }
+    .pill:hover { border-color: var(--gold); transform: translateY(-1px); }
+    .pill.primary { background: var(--forest); color: var(--forest-ink); border-color: var(--forest); }
+
+    h2 { display: flex; align-items: center; gap: 16px; font: 600 28px 'Cormorant Garamond', Georgia, serif; margin: 56px 0 24px; }
+    h2::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+    .grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); }
+    .card { display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 24px; background: var(--surface); box-shadow: 0 10px 30px -18px rgba(40, 30, 10, .35); transition: transform .3s; }
+    .card:hover { transform: translateY(-3px); }
+    .shot { display: block; aspect-ratio: 16 / 10; overflow: hidden; border-bottom: 1px solid var(--line); background: var(--bg); }
+    .shot img { width: 100%; height: 100%; object-fit: cover; object-position: top; transition: transform .6s; }
+    .card:hover .shot img { transform: scale(1.03); }
+    .body { display: flex; flex-direction: column; flex: 1; padding: 24px 26px 26px; }
+    .meta { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); }
+    .card h3 { font: 600 32px/1.1 'Cormorant Garamond', Georgia, serif; margin-top: 10px; }
+    .card p { margin-top: 8px; color: var(--muted); }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+    .tag { padding: 3px 10px; border-radius: 999px; background: var(--bg); font-size: 12px; color: var(--muted); }
+    .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 22px; }
+
+    .log { list-style: none; padding: 0; border-top: 1px solid var(--line); }
+    .log li { display: grid; grid-template-columns: 110px 1fr; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+    .log time { color: var(--muted); font-size: 14px; }
+    .log b { font-weight: 500; }
+    .log span { color: var(--muted); }
+
+    footer { padding: 56px 0 72px; color: var(--muted); font-size: 14px; }
+    @media (max-width: 560px) {
+      header { padding: 48px 0 40px; }
+      .log li { grid-template-columns: 1fr; gap: 2px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="eyebrow">Портфолио</p>
+      <h1>Элтегин — проекты</h1>
+      <p class="lead">Делаю веб-приложения и сайты: от идеи до работающей ссылки. Здесь — всё, что уже запущено.</p>
+      <div class="contacts">
+        <a class="pill primary" href="mailto:eltegin.zyrgalbek@gmail.com">Написать мне</a>
+        <a class="pill" href="https://github.com/AbuYaqinEltegin">GitHub</a>
+      </div>
+    </header>
+
+    <main>
+      <h2>Проекты</h2>
+      <div class="grid" id="projects"></div>
+
+      <h2>Журнал</h2>
+      <ul class="log" id="log"></ul>
+    </main>
+
+    <footer>© <span id="year"></span> Элтегин</footer>
+  </div>
+
+  <script>
+    // Новый проект — новый объект в начале списка. Картинка — в папку img/.
+    const projects = [
+      {
+        title: 'Калима',
+        date: '2026-10',
+        kind: 'Веб-приложение',
+        description: 'Карточки арабских слов с интервальным повторением: 18 колод, 390 слов, озвучка, тест и статистика. Работает офлайн и ставится на телефон.',
+        image: 'img/kalima.png',
+        tags: ['React', 'Vite', 'Tailwind', 'PWA'],
+        site: 'https://kalima-seven.vercel.app',
+        code: 'https://github.com/AbuYaqinEltegin/kalima',
+        learned: 'Алгоритм SM-2, PWA, деплой на Vercel',
+      },
+    ]
+
+    const months = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек']
+    const fmt = (d) => { const [y, m] = d.split('-'); return `${months[m - 1]} ${y}` }
+    const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+
+    document.getElementById('projects').innerHTML = projects.map((p) => `
+      <article class="card">
+        <a class="shot" href="${p.site}" target="_blank" rel="noopener"><img src="${p.image}" alt="${esc(p.title)}" loading="lazy"></a>
+        <div class="body">
+          <div class="meta"><span>${esc(p.kind)}</span><span>${fmt(p.date)}</span></div>
+          <h3>${esc(p.title)}</h3>
+          <p>${esc(p.description)}</p>
+          <div class="tags">${p.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div>
+          <div class="links">
+            <a class="pill primary" href="${p.site}" target="_blank" rel="noopener">Открыть сайт</a>
+            <a class="pill" href="${p.code}" target="_blank" rel="noopener">Код на GitHub</a>
+          </div>
+        </div>
+      </article>`).join('')
+
+    document.getElementById('log').innerHTML = projects.map((p) => `
+      <li><time>${fmt(p.date)}</time><div><b>${esc(p.title)}</b> — <span>${esc(p.learned)}</span></div></li>`).join('')
+
+    document.getElementById('year').textContent = new Date().getFullYear()
+  </script>
+</body>
+</html>
