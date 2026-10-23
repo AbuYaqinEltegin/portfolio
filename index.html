@@ -80,28 +80,34 @@
       .menu a sup { right: auto; left: 0; top: 4px; }
     }
 
-    /* ---------- первый экран: 3D-сцена ---------- */
-    .hero { position: relative; min-height: 100svh; display: grid; place-items: center; text-align: center; padding: 120px 0 150px; overflow: hidden; background: radial-gradient(70% 60% at 50% 35%, #1c2420, var(--bg) 70%); }
-    .scene { position: absolute; inset: 0; perspective: 1100px; pointer-events: none; }
-    /* пирамида: 4 треугольные грани (высота 0.85 стороны → наклон грани 30.5°) и основание */
-    .pyr { position: absolute; left: var(--x); top: var(--y); width: var(--s); height: var(--s); transform-style: preserve-3d; transform: rotateX(var(--rx)) rotateY(var(--ry)); animation: drift var(--t) ease-in-out infinite alternate; }
-    .pyr i { position: absolute; left: 0; bottom: 50%; width: 100%; height: calc(var(--s) * .986); transform-origin: 50% 100%; clip-path: polygon(50% 0, 100% 100%, 0 100%); background: linear-gradient(170deg, #2a342f, #0f1311 85%); }
-    .pyr i:nth-child(1) { transform: translateZ(calc(var(--s) / 2)) rotateX(30.5deg); background: linear-gradient(165deg, rgba(236, 170, 72, .95), #3e2816 80%); }
-    .pyr i:nth-child(2) { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)) rotateX(30.5deg); background: linear-gradient(190deg, rgba(214, 140, 60, .7), #24180f 80%); }
-    .pyr i:nth-child(3) { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)) rotateX(30.5deg); }
-    .pyr i:nth-child(4) { transform: rotateY(270deg) translateZ(calc(var(--s) / 2)) rotateX(30.5deg); }
-    .pyr b { position: absolute; inset: 0; transform: rotateX(90deg); background: #0d100f; }
-    @keyframes drift { to { transform: rotateX(calc(var(--rx) + 14deg)) rotateY(calc(var(--ry) + 70deg)) translateY(-16px); } }
-    .orb { position: absolute; left: 62%; top: 22%; width: clamp(56px, 7vw, 92px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff1c9, #f0b24a 45%, #d0702c 80%); box-shadow: 0 0 60px 20px rgba(240, 170, 70, .35), 0 0 200px 80px rgba(240, 150, 60, .12); animation: glow 5s ease-in-out infinite alternate; }
-    @keyframes glow { to { transform: translateY(-10px); box-shadow: 0 0 80px 26px rgba(240, 170, 70, .42), 0 0 240px 100px rgba(240, 150, 60, .14); } }
-    .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, var(--bg)); pointer-events: none; }
+    /* ---------- первый экран: богатыри скачут в степь на закате ---------- */
+    .hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; align-items: center; text-align: center; padding: clamp(120px, 17vh, 180px) 0 0; overflow: hidden;
+      background: radial-gradient(70% 40% at 63% 74%, rgba(230, 150, 60, .4), transparent 70%), linear-gradient(180deg, #0d1311 0%, #13201a 42%, #2b2a18 70%, #3d2d16 82%); }
+    .steppe { position: absolute; left: 0; bottom: 0; width: 100%; height: 66%; pointer-events: none; color: #080b0a; }
+    .grass { animation: run 1.1s linear infinite; }
+    @keyframes run { to { transform: translateX(-400px); } }
+    .riders { animation: sway 7s ease-in-out infinite alternate; }
+    @keyframes sway { from { transform: translateX(-30px); } to { transform: translateX(40px); } }
+    .horse { animation: bob .5s ease-in-out infinite var(--d); }
+    @keyframes bob { 50% { transform: translateY(-7px); } }
+    /* ноги качаются от бедра; задние — в противофазе, вторая нога пары чуть отстаёт */
+    .leg { transform-box: fill-box; transform-origin: 50% 0; animation: legF .5s ease-in-out infinite var(--d); }
+    .leg.b { animation-name: legB; }
+    .leg.l2 { animation-delay: calc(var(--d) - .07s); }
+    @keyframes legF { 0%, 100% { transform: rotate(-38deg); } 50% { transform: rotate(32deg); } }
+    @keyframes legB { 0%, 100% { transform: rotate(30deg); } 50% { transform: rotate(-34deg); } }
+    .tail, .cape, .flag { transform-box: fill-box; animation: flutter .3s ease-in-out infinite alternate; }
+    .tail, .cape { transform-origin: 100% 0; }
+    .flag { transform-origin: 0 50%; fill: var(--gold); }
+    .kalpak { fill: #e6dcc6; }
+    @keyframes flutter { to { transform: rotate(-10deg) scaleX(1.08); } }
+    .dust circle { fill: #8a6a3e; transform-box: fill-box; transform-origin: center; animation: dust 1s linear infinite; }
+    @keyframes dust { from { transform: translate(0, 0) scale(.4); opacity: .5; } to { transform: translate(-110px, -26px) scale(2); opacity: 0; } }
+    .hero::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 22%; background: linear-gradient(180deg, transparent, var(--bg)); pointer-events: none; }
     .hero-text { position: relative; z-index: 1; padding: 0 16px; }
     .hero h1 { font: 800 clamp(54px, 14.5vw, 200px)/.95 var(--sans); text-transform: uppercase; letter-spacing: .01em; text-shadow: 0 10px 40px rgba(0, 0, 0, .45); }
     .hero .roles { margin-top: clamp(20px, 3vw, 36px); font: 700 clamp(13px, 2.1vw, 24px)/1.5 var(--mono); text-transform: uppercase; letter-spacing: .14em; }
     .hero .roles b { color: var(--gold); }
-    .tools { margin-top: clamp(48px, 9vh, 96px); }
-    .tools p { font: 700 clamp(12px, 1.6vw, 18px) var(--sans); letter-spacing: .24em; text-transform: uppercase; color: rgba(236, 228, 212, .35); }
-    .tools ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px clamp(18px, 3vw, 40px); list-style: none; padding: 0; margin-top: 16px; font: 700 clamp(17px, 2.4vw, 28px) var(--sans); color: rgba(236, 228, 212, .42); }
     .mouse { position: absolute; left: 50%; bottom: 36px; z-index: 1; translate: -50% 0; width: 34px; height: 58px; border: 2px solid var(--ink); border-radius: 18px; display: grid; place-items: center; color: var(--gold); text-decoration: none; }
     .mouse span { animation: nudge 1.6s ease-in-out infinite; }
     @keyframes nudge { 50% { transform: translateY(6px); } }
@@ -111,21 +117,23 @@
     h2 { font: 800 clamp(40px, 7vw, 84px)/1.05 var(--sans); text-align: center; letter-spacing: -.01em; }
     .sub-title { max-width: 34em; margin: 18px auto 0; text-align: center; color: var(--muted); font: 15px/1.7 var(--mono); }
 
-    /* ---------- что я делаю: вращающиеся кольца с надписями ---------- */
+    /* ---------- чем я занимаюсь: три круга с «хвостами» вращаются, как инь-ян ---------- */
     #skills { overflow: hidden; }
-    .orbit { position: relative; width: min(94vw, 900px); aspect-ratio: 1; margin: 0 auto; }
-    .orbit::before { content: ''; position: absolute; inset: 22%; border-radius: 50%; background: radial-gradient(circle, rgba(47, 122, 90, .22), transparent 70%); }
-    .ring-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; animation: spin var(--t) linear infinite; }
-    .ring-svg.rev { animation-direction: reverse; }
-    .orbit:hover .ring-svg { animation-play-state: paused; }
-    @keyframes spin { to { rotate: 360deg; } }
-    .ring-svg text { font: 800 var(--fs) var(--sans); text-transform: uppercase; fill: var(--c); }
-    .ring-svg text tspan { fill: var(--gold); }
-    .ring-svg circle { fill: none; stroke: var(--line); stroke-width: 1.5; }
-    .orbit-center { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; pointer-events: none; }
-    .orbit-center p { font: 700 clamp(11px, 1.4vw, 14px) var(--mono); color: var(--gold); }
-    .orbit-center h2 { margin-top: 8px; font-size: clamp(26px, 5vw, 56px); line-height: 1.02; }
-    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .tri { position: relative; width: min(96vw, 880px); aspect-ratio: 1; margin: 0 auto; container-type: inline-size; }
+    .tri-spin { position: absolute; inset: 0; animation: spin 48s linear infinite; }
+    .tri:hover .tri-spin, .tri:hover .face { animation-play-state: paused; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .tails { position: absolute; inset: 0; width: 100%; height: 100%; }
+    /* круг на орбите: повернуть на свой угол, вынести от центра, вернуть поворот */
+    .dot { position: absolute; left: 50%; top: 50%; width: 34%; aspect-ratio: 1; transform: translate(-50%, -50%) rotate(var(--a)) translateY(-33cqw) rotate(calc(-1 * var(--a))); }
+    /* обратное вращение держит текст ровным, пока вся тройка крутится */
+    .face { width: 100%; height: 100%; border-radius: 50%; display: grid; place-content: center; justify-items: center; gap: 1cqw; padding: 4cqw; text-align: center; background: var(--c); color: var(--t); box-shadow: 0 24px 60px -24px rgba(0, 0, 0, .7); animation: spin 48s linear infinite reverse; }
+    .face svg { width: min(5.6cqw, 46px); height: auto; }
+    .face h3 { font: 800 min(3.5cqw, 28px)/1.1 var(--sans); }
+    .face p { font: 500 min(2.3cqw, 15px)/1.45 var(--mono); opacity: .85; }
+    .tri-center { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; pointer-events: none; }
+    .tri-center p { font: 700 min(2.2cqw, 13px) var(--mono); color: var(--gold); }
+    .tri-center h2 { margin-top: .5em; font-size: min(4.2cqw, 34px); line-height: 1.12; }
 
     /* ---------- мой путь ---------- */
     .path { display: grid; gap: 36px; margin-top: clamp(48px, 7vw, 80px); }
@@ -226,11 +234,6 @@
     .js .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s ease; }
     .js .reveal.in { opacity: 1; transform: none; }
 
-    @media (max-width: 640px) {
-      .pyr.p1 { --x: 2% !important; --s: 120px !important; }
-      .pyr.p2 { --x: 50% !important; --s: 140px !important; }
-      .orb { left: 70%; top: 18%; }
-    }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       *, *::before, *::after { animation: none !important; }
@@ -264,34 +267,56 @@
 
   <main id="top">
     <section class="hero">
-      <div class="scene" aria-hidden="true">
-        <div class="pyr p1" style="--x:20%;--y:22%;--s:200px;--rx:-14deg;--ry:20deg;--t:16s"><i></i><i></i><i></i><i></i><b></b></div>
-        <div class="pyr p2" style="--x:50%;--y:42%;--s:240px;--rx:-10deg;--ry:-35deg;--t:19s"><i></i><i></i><i></i><i></i><b></b></div>
-        <div class="pyr p3" style="--x:34%;--y:70%;--s:100px;--rx:-18deg;--ry:60deg;--t:12s"><i></i><i></i><i></i><i></i><b></b></div>
-        <div class="pyr p4" style="--x:76%;--y:64%;--s:76px;--rx:-8deg;--ry:-50deg;--t:14s"><i></i><i></i><i></i><i></i><b></b></div>
-        <div class="orb"></div>
-      </div>
+      <svg class="steppe" viewBox="0 0 1600 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <defs>
+          <radialGradient id="sunG"><stop offset="0" stop-color="#ffe6a8"/><stop offset=".55" stop-color="#f0b24a"/><stop offset="1" stop-color="#d4762e"/></radialGradient>
+          <radialGradient id="glowG"><stop offset="0" stop-color="#f0b24a" stop-opacity=".5"/><stop offset="1" stop-color="#f0b24a" stop-opacity="0"/></radialGradient>
+        </defs>
+        <circle cx="1010" cy="300" r="280" fill="url(#glowG)"/>
+        <circle cx="1010" cy="300" r="82" fill="url(#sunG)"/>
+        <!-- хребты Ала-Тоо со снежными вершинами -->
+        <path d="M0 420 120 330 190 370 300 270 360 300 420 250 520 340 600 300 700 360 780 300 860 340 950 320 1010 350 1080 330 1150 290 1230 350 1320 280 1420 340 1520 300 1600 330V600H0Z" fill="#1d2b25"/>
+        <path d="M300 270 324 288 310 285 298 293 284 284ZM420 250 446 270 430 266 418 276 402 266ZM1320 280 1344 297 1330 294 1318 302 1304 293Z" fill="#e6dcc6" opacity=".45"/>
+        <path d="M0 470C200 440 380 455 560 445 760 432 960 450 1160 440 1360 430 1480 446 1600 440V600H0Z" fill="#141c18"/>
+        <rect y="500" width="1600" height="100" fill="#0e1311"/>
+        <g class="grass" id="grass" stroke="#22302a" stroke-width="2.5" stroke-linecap="round"></g>
+        <g class="riders" id="riders"></g>
+      </svg>
       <div class="hero-text">
         <h1>Элтегин</h1>
         <p class="roles">Веб-разработка<b>,</b> автоматизация <b>&amp;</b> короткие видео<b>.</b></p>
-        <div class="tools">
-          <p>Инструменты</p>
-          <ul>
-            <li>React</li><li>Tailwind</li><li>Make.com</li><li>Vercel</li><li>GitHub</li><li>Claude Code</li>
-          </ul>
-        </div>
       </div>
       <a class="mouse" href="#skills" aria-label="Листать вниз"><span>↓</span></a>
     </section>
 
     <section class="block" id="skills">
-      <div class="orbit reveal" id="orbit" aria-hidden="true"></div>
-      <div class="orbit-center"><p>// 02</p><h2>Чем я<br>занимаюсь</h2></div>
-      <ul class="sr-only">
-        <li>Веб-разработка: лендинги и веб-приложения на React, PWA, публикация на своём домене.</li>
-        <li>Автоматизация на Make.com: заявка → таблица → письмо → уведомление в Telegram.</li>
-        <li>Короткие видео: монтаж для Reels, Shorts и TikTok, субтитры.</li>
-      </ul>
+      <div class="tri reveal">
+        <div class="tri-spin">
+          <svg class="tails" id="tails" viewBox="0 0 1000 1000" aria-hidden="true"></svg>
+          <article class="dot" style="--a: 0deg">
+            <div class="face" style="--c: var(--gold); --t: var(--deep)">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"><rect x="4" y="7" width="40" height="27" rx="2"/><path d="M14 41h20M24 34v7"/></svg>
+              <h3>Веб-разработка</h3>
+              <p>Лендинги и веб-приложения: React, PWA</p>
+            </div>
+          </article>
+          <article class="dot" style="--a: 120deg">
+            <div class="face" style="--c: var(--green); --t: var(--ink)">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="9" cy="24" r="5"/><circle cx="39" cy="11" r="5"/><circle cx="39" cy="37" r="5"/><path d="M14 24c10 0 10-13 20-13M14 24c10 0 10 13 20 13"/></svg>
+              <h3>Автоматизация</h3>
+              <p>Make.com: заявки, таблицы, письма, Telegram</p>
+            </div>
+          </article>
+          <article class="dot" style="--a: 240deg">
+            <div class="face" style="--c: #e6dcc6; --t: var(--deep)">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"><rect x="12" y="3" width="24" height="42" rx="4"/><path d="M21 18v12l10-6z"/></svg>
+              <h3>Короткие видео</h3>
+              <p>Монтаж Reels, Shorts и TikTok, субтитры</p>
+            </div>
+          </article>
+        </div>
+        <div class="tri-center"><p>// 02</p><h2>Чем я<br>занимаюсь</h2></div>
+      </div>
     </section>
 
     <section class="block" id="path">
@@ -425,21 +450,54 @@
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
     document.getElementById('year').textContent = new Date().getFullYear()
 
-    // ---------- «Чем я занимаюсь»: надписи по окружностям; textLength растягивает текст ровно на круг ----------
-    const RINGS = [
-      { r: 455, fs: 38, c: 'var(--ink)', t: 80, text: 'Веб-разработка • лендинги • веб-приложения • React • PWA • Tailwind • свой домен • ' },
-      { r: 345, fs: 34, c: 'var(--gold)', t: 60, rev: true, text: 'Автоматизация • Make.com • заявка → таблица → письмо → Telegram • ' },
-      { r: 240, fs: 30, c: '#7cc4a0', t: 45, text: 'Короткие видео • Reels • Shorts • TikTok • монтаж • субтитры • ' },
-    ]
-    document.getElementById('orbit').innerHTML = RINGS.map((g, i) => {
-      const len = (2 * Math.PI * g.r).toFixed(0)
-      const words = g.text.split('•').map((w) => w.trim()).filter(Boolean)
-      return `<svg class="ring-svg${g.rev ? ' rev' : ''}" viewBox="0 0 1000 1000" style="--t:${g.t}s;--fs:${g.fs}px;--c:${g.c}">
-        <path id="ring${i}" d="M500 ${500 - g.r}a${g.r} ${g.r} 0 1 1 0 ${2 * g.r}a${g.r} ${g.r} 0 1 1 0 ${-2 * g.r}" fill="none"/>
-        <circle cx="500" cy="500" r="${g.r + g.fs * .85}"/>
-        <text textLength="${len}" lengthAdjust="spacing"><textPath href="#ring${i}">${words.map((w) => `${w} <tspan>•</tspan> `).join('')}</textPath></text>
-      </svg>`
-    }).join('')
+    // ---------- степь: трава (узор повторяется каждые 400 единиц — так бег зациклен без шва) ----------
+    let grass = ''
+    for (let k = 0; k < 6; k++)
+      for (let i = 0; i < 16; i++) {
+        const x = k * 400 + i * 25 + (i * 7) % 11, y = 515 + ((i * 37) % 80), h = 8 + ((i * 13) % 14)
+        grass += `<path d="M${x} ${y}l-4 ${-h}M${x} ${y}l3 ${-h * .8}"/>`
+      }
+    document.getElementById('grass').innerHTML = grass
+
+    // ---------- богатыри: конь (корпус, хвост, 4 ноги) и всадник в калпаке с копьём и флажком ----------
+    const LEG = 'M-6 0H6L5 28 4 52 7 60H-3V52L-4 28Z'
+    const leg = (x, cls) => `<g transform="translate(${x} 80)"><path class="leg ${cls}" d="${LEG}"/></g>`
+    const RIDER = `
+      <g transform="translate(40 62)"><path class="tail" d="M0 0C-14 2-26 12-34 30-24 24-14 20-2 14Z"/></g>
+      ${leg(136, 'l2')}${leg(50, 'b l2')}
+      <path d="M38 62C40 48 60 42 92 43 112 44 128 42 140 34 148 26 156 16 164 8 168 3 176 2 181 6L198 20C201 23 199 28 194 28L184 27C178 34 172 46 166 60 162 72 154 84 136 86L66 88C48 88 36 78 38 62Z"/>
+      ${leg(148, '')}${leg(62, 'b')}
+      <g transform="translate(92 18)"><path class="cape" d="M0 0C-20 4-32 16-38 28-24 22-12 18 2 10Z"/></g>
+      <path d="M92 46 100 70 110 72 108 77 95 75 85 50Z"/>
+      <path d="M84 50 104 47 112 16 96 10Z"/>
+      <circle cx="107" cy="2" r="8"/>
+      <path class="kalpak" d="M97-1 105-30 117-1Z"/><path d="M95-1H119V3H95Z"/>
+      <path d="M104 18 132 28 130 33 101 25Z"/>
+      <path d="M86 44 262-14" stroke="currentColor" stroke-width="3.5" fill="none"/>
+      <path d="M270-17 254-16 259-6Z"/>
+      <g transform="translate(236 -5)"><path class="flag" d="M0 0 28-2 18 8 26 16 0 12Z"/></g>`
+    // дальние (мельче, выше по склону) рисуются раньше ближних
+    const RIDERS = [[1100, 398, .62, -.1], [860, 360, .95, -.27], [380, 380, .8, -.4], [600, 340, 1.3, 0]]
+    document.getElementById('riders').innerHTML = RIDERS.map(([x, y, s, d]) => `
+      <g transform="translate(${x} ${y}) scale(${s})" style="--d:${d}s" fill="currentColor">
+        <g class="dust"><circle cx="40" cy="146" r="10" style="animation-delay:${d}s"/><circle cx="150" cy="146" r="8" style="animation-delay:${d - .5}s"/></g>
+        <g class="horse">${RIDER}</g>
+      </g>`).join('')
+
+    // ---------- «Чем я занимаюсь»: хвосты-запятые за кругами (три части инь-ян) ----------
+    // хвост тянется за кругом против хода вращения и сужается к концу
+    const pt = (r, deg) => { const a = deg * Math.PI / 180; return `${(500 + r * Math.sin(a)).toFixed(1)} ${(500 - r * Math.cos(a)).toFixed(1)}` }
+    const tail = (a) => {
+      const R = 330, h = 170, N = 24, outer = [], inner = []
+      for (let i = 0; i <= N; i++) {
+        const t = i / N, th = a - 115 * t
+        outer.push(pt(R + h * (1 - t), th))
+        inner.push(pt(R - h * (1 - t), th))
+      }
+      return `M${outer.join('L')}L${inner.reverse().join('L')}Z`
+    }
+    document.getElementById('tails').innerHTML = [[0, 'var(--gold)'], [120, 'var(--green)'], [240, '#e6dcc6']]
+      .map(([a, c]) => `<path d="${tail(a)}" fill="${c}" opacity=".22"/>`).join('')
 
     // ---------- приветствие: розетка из «кочкор мүйүз» (бараньих рогов) и ромбов-тумаров ----------
     const intro = document.getElementById('intro')
