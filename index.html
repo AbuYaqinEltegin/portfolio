@@ -4,179 +4,485 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Элтегин — проекты</title>
-  <meta name="description" content="Элтегин: сайты и веб-приложения, короткие видео, автоматизация на Make.com." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%231f4a38'/><text x='32' y='44' font-size='34' text-anchor='middle' fill='%23c9a23a' font-family='Georgia,serif'>Э</text></svg>" />
+  <meta name="description" content="Элтегин: сайты, автоматизация на Make.com и короткие видео. Начинающий, открыт к первым заказам." />
+  <meta name="theme-color" content="#0e1311" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%231f4a38'/><text x='32' y='44' font-size='34' text-anchor='middle' fill='%23d2ae4f' font-family='Georgia,serif'>Э</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>
+    // До отрисовки: решаем, показывать ли приветствие (один раз за сеанс; ?intro=0 — сразу сайт)
+    document.documentElement.classList.add('js')
+    try {
+      if (sessionStorage.getItem('introSeen') || new URLSearchParams(location.search).get('intro') === '0')
+        document.documentElement.classList.add('no-intro')
+    } catch (e) {}
+  </script>
   <style>
     :root {
-      --bg: #f3ece0; --surface: #faf5ec; --ink: #1d2a24; --muted: #6b6a60;
-      --line: #ddd2bf; --gold: #9c7a22; --forest: #1f4a38; --forest-ink: #f3ece0;
-      --glow-a: rgba(201, 162, 58, .16); --glow-b: rgba(47, 156, 134, .12);
-    }
-    @media (prefers-color-scheme: dark) {
-      :root { --bg: #121a16; --surface: #18231e; --ink: #ece4d4; --muted: #9a9686; --line: #2c3a33; --gold: #d2ae4f;
-        --glow-a: rgba(210, 174, 79, .08); --glow-b: rgba(47, 156, 134, .08); }
+      color-scheme: dark;
+      --bg: #0e1311; --bg-2: #121916; --surface: #161f1b; --ink: #ece4d4; --muted: #8f958a;
+      --line: #25312b; --gold: #d2ae4f; --gold-dim: rgba(210, 174, 79, .14); --forest: #1f4a38; --forest-2: #2f6b52;
+      --serif: 'Cormorant Garamond', Georgia, serif; --mono: 'JetBrains Mono', ui-monospace, monospace;
     }
     * { box-sizing: border-box; margin: 0; }
-    body {
-      background:
-        radial-gradient(900px 600px at 100% 40%, var(--glow-a), transparent 70%),
-        radial-gradient(800px 600px at 0% 85%, var(--glow-b), transparent 70%),
-        var(--bg);
-      color: var(--ink); font: 16px/1.6 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased;
-    }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+    body { background: var(--bg); color: var(--ink); font: 16px/1.65 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
     a { color: inherit; }
-    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+    img { max-width: 100%; display: block; }
+    :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 6px; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+    @media (min-width: 720px) { .wrap { padding: 0 40px; } }
 
-    /* шапка с картинкой */
-    .hero { position: relative; overflow: hidden; color: #f3ece0; background: #0d2620 url(img/hero-bg.svg) center / cover no-repeat; }
-    .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(13, 38, 32, .85) 0%, rgba(13, 38, 32, .35) 60%, transparent 100%); }
-    .hero .wrap { position: relative; z-index: 1; padding-top: 96px; padding-bottom: 96px; }
-    .eyebrow { font-size: 12px; letter-spacing: .3em; text-transform: uppercase; color: #d9a93f; }
-    h1 { font: 600 clamp(48px, 9vw, 84px)/1 'Cormorant Garamond', Georgia, serif; margin-top: 14px; }
-    .lead { max-width: 540px; margin-top: 18px; font-size: 18px; color: rgba(243, 236, 224, .78); }
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
-    .chip { padding: 5px 14px; border: 1px solid rgba(217, 169, 63, .35); border-radius: 999px; font-size: 13px; color: #e8d3a0; background: rgba(13, 38, 32, .4); backdrop-filter: blur(6px); }
-    .contacts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+    /* ---------- приветствие ---------- */
+    .intro { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: var(--bg); transition: opacity .5s ease; }
+    .no-intro .intro { display: none; }
+    .intro.out { opacity: 0; pointer-events: none; }
+    .intro .stage { display: grid; justify-items: center; gap: 28px; padding: 16px; }
+    .intro svg { width: min(72vw, 360px); height: auto; color: var(--gold); overflow: visible; }
+    .intro svg path { stroke-dasharray: 1; }
+    .intro .ring { opacity: 0; transition: opacity .6s .5s; }
+    .intro.go .ring { opacity: .5; }
+    .intro p { font: 500 clamp(22px, 5vw, 34px)/1.25 var(--serif); text-align: center; max-width: 18em; opacity: 0; transform: translateY(8px); transition: opacity .6s, transform .6s; }
+    .intro p span { display: block; color: var(--gold); }
+    .intro.say p { opacity: 1; transform: none; }
+    .skip { position: absolute; right: 16px; bottom: 16px; min-height: 44px; padding: 0 18px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); font: 13px var(--mono); cursor: pointer; transition: color .2s, border-color .2s; }
+    .skip:hover { color: var(--ink); border-color: var(--gold); }
 
-    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); text-decoration: none; font-size: 14px; transition: border-color .2s, transform .2s; }
-    .pill:hover { border-color: var(--gold); transform: translateY(-1px); }
-    .pill.primary { background: var(--forest); color: var(--forest-ink); border-color: var(--forest); }
-    .hero .pill { background: rgba(243, 236, 224, .08); color: #f3ece0; border-color: rgba(243, 236, 224, .25); backdrop-filter: blur(6px); }
-    .hero .pill.primary { background: #d9a93f; color: #0d2620; border-color: #d9a93f; font-weight: 500; }
+    /* ---------- навигация ---------- */
+    .nav { position: fixed; inset: 0 0 auto; z-index: 50; background: rgba(14, 19, 17, .72); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid transparent; transition: border-color .3s; }
+    .nav.scrolled { border-color: var(--line); }
+    .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+    .logo { font: 500 17px var(--mono); text-decoration: none; letter-spacing: .02em; }
+    .logo i { font-style: normal; color: var(--gold); animation: blink 1.1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .menu { display: flex; gap: 6px; list-style: none; padding: 0; }
+    .menu a { display: flex; align-items: baseline; gap: 6px; min-height: 44px; align-items: center; padding: 0 12px; font: 14px var(--mono); color: var(--muted); text-decoration: none; transition: color .2s; }
+    .menu a:hover { color: var(--ink); }
+    .menu small { font-size: 10px; color: var(--gold); }
+    .burger { display: none; width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 12px; background: none; color: var(--ink); cursor: pointer; }
+    .burger span, .burger span::before, .burger span::after { display: block; width: 18px; height: 1.5px; margin: auto; background: currentColor; position: relative; transition: transform .3s; }
+    .burger span::before, .burger span::after { content: ''; position: absolute; left: 0; }
+    .burger span::before { top: -6px; } .burger span::after { top: 6px; }
+    .nav.open .burger span { background: transparent; }
+    .nav.open .burger span::before { transform: translateY(6px) rotate(45deg); }
+    .nav.open .burger span::after { transform: translateY(-6px) rotate(-45deg); }
+    @media (max-width: 760px) {
+      .burger { display: block; }
+      .menu { position: absolute; top: 68px; left: 0; right: 0; flex-direction: column; gap: 0; padding: 8px 16px 20px; background: var(--bg); border-bottom: 1px solid var(--line); display: none; }
+      .nav.open .menu { display: flex; }
+      .menu a { min-height: 52px; font-size: 16px; border-bottom: 1px solid var(--line); }
+    }
 
-    h2 { display: flex; align-items: center; gap: 16px; font: 600 30px 'Cormorant Garamond', Georgia, serif; margin: 64px 0 24px; }
-    h2::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+    /* ---------- первый экран ---------- */
+    .hero { position: relative; min-height: 100svh; display: flex; align-items: center; padding: 120px 0 80px; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(60% 50% at 78% 40%, rgba(47, 107, 82, .28), transparent 70%), radial-gradient(40% 35% at 85% 30%, rgba(210, 174, 79, .10), transparent 70%); }
+    .hero-orn { position: absolute; right: -14%; top: 50%; width: min(78vw, 760px); translate: 0 -50%; color: var(--gold); opacity: .16; animation: spin 140s linear infinite; pointer-events: none; }
+    @keyframes spin { to { rotate: 360deg; } }
+    .hero .wrap { position: relative; width: 100%; }
+    .kicker { font: 13px var(--mono); color: var(--gold); letter-spacing: .04em; }
+    .hero h1 { font: 600 clamp(56px, 15vw, 168px)/.9 var(--serif); letter-spacing: -.01em; margin: 18px 0 0 -.04em; }
+    .hero .roles { margin-top: 26px; font: clamp(14px, 2.4vw, 18px) var(--mono); color: var(--ink); }
+    .hero .roles b { color: var(--gold); font-weight: 400; }
+    .hero .honest { max-width: 30em; margin-top: 18px; color: var(--muted); font-size: 17px; }
+    .status { display: inline-flex; align-items: center; gap: 10px; margin-top: 28px; padding: 8px 16px; border: 1px solid var(--line); border-radius: 999px; font-size: 14px; background: rgba(22, 31, 27, .6); }
+    .status::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #5fbf8f; box-shadow: 0 0 0 4px rgba(95, 191, 143, .15); }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 24px; border: 1px solid var(--line); border-radius: 999px; font-weight: 500; font-size: 15px; text-decoration: none; transition: border-color .2s, background .2s, transform .2s; }
+    .btn:hover { border-color: var(--gold); transform: translateY(-1px); }
+    .btn.gold { background: var(--gold); border-color: var(--gold); color: #14110a; }
+    .btn.gold:hover { background: #e0bf62; }
+    .scroll-hint { position: absolute; left: 50%; bottom: 28px; translate: -50% 0; width: 26px; height: 42px; border: 1.5px solid var(--line); border-radius: 14px; }
+    .scroll-hint::after { content: ''; position: absolute; left: 50%; top: 9px; width: 3px; height: 8px; margin-left: -1.5px; border-radius: 2px; background: var(--gold); animation: wheel 1.8s ease-in-out infinite; }
+    @keyframes wheel { 0% { opacity: 0; transform: translateY(0); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(12px); } }
 
-    /* направления */
-    .services { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
-    .service { position: relative; overflow: hidden; padding: 28px 26px; border: 1px solid var(--line); border-radius: 24px; background: var(--surface); }
-    .service::before { content: ''; position: absolute; width: 180px; height: 180px; right: -60px; top: -60px; border-radius: 50%; background: var(--accent); opacity: .14; filter: blur(10px); }
-    .service .icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: var(--accent); color: #fff8ec; }
-    .service .icon svg { width: 24px; height: 24px; }
-    .service h3 { font: 600 26px/1.15 'Cormorant Garamond', Georgia, serif; margin-top: 18px; }
-    .service p { margin-top: 8px; color: var(--muted); font-size: 15px; }
+    /* ---------- секции ---------- */
+    section.block { padding: 110px 0; border-top: 1px solid var(--line); }
+    .label { font: 13px var(--mono); color: var(--gold); }
+    .label span { color: var(--muted); }
+    h2 { font: 600 clamp(38px, 7vw, 64px)/1 var(--serif); margin-top: 14px; }
+    .intro-text { max-width: 36em; margin-top: 18px; color: var(--muted); font-size: 17px; }
 
-    /* проекты */
-    .grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); }
-    .card { display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 24px; background: var(--surface); box-shadow: 0 10px 30px -18px rgba(40, 30, 10, .35); transition: transform .3s; }
-    .card:hover { transform: translateY(-3px); }
-    .shot { display: block; aspect-ratio: 16 / 10; overflow: hidden; border-bottom: 1px solid var(--line); background: var(--bg); }
+    .services { display: grid; gap: 1px; margin-top: 56px; background: var(--line); border: 1px solid var(--line); border-radius: 22px; overflow: hidden; }
+    @media (min-width: 860px) { .services { grid-template-columns: repeat(3, 1fr); } }
+    .service { position: relative; padding: 36px 30px 40px; background: var(--bg); transition: background .3s; }
+    .service:hover { background: var(--bg-2); }
+    .service::after { content: ''; position: absolute; left: 30px; right: 30px; bottom: 0; height: 2px; background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform .4s; }
+    .service:hover::after { transform: scaleX(1); }
+    .service .num { font: 12px var(--mono); color: var(--muted); }
+    .service svg { width: 30px; height: 30px; margin-top: 28px; color: var(--gold); }
+    .service h3 { font: 600 28px/1.15 var(--serif); margin-top: 18px; }
+    .service p { margin-top: 10px; color: var(--muted); font-size: 15px; }
+
+    /* ---------- мой путь: вкладки ---------- */
+    .path { display: grid; gap: 28px; margin-top: 56px; }
+    @media (min-width: 860px) { .path { grid-template-columns: 240px 1fr; gap: 56px; } }
+    .tabs { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; }
+    .tabs::-webkit-scrollbar { display: none; }
+    @media (min-width: 860px) { .tabs { flex-direction: column; gap: 0; margin: 0; padding: 0; border-left: 1px solid var(--line); align-self: start; position: sticky; top: 100px; } }
+    .tab { flex: none; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 48px; padding: 10px 18px; border: 1px solid var(--line); border-radius: 999px; background: none; color: var(--muted); font: 500 15px Inter, sans-serif; text-align: left; cursor: pointer; transition: color .2s, border-color .2s, background .2s; }
+    .tab small { display: none; font: 11px var(--mono); color: var(--muted); }
+    .tab:hover { color: var(--ink); }
+    .tab[aria-selected="true"] { color: var(--ink); border-color: var(--gold); background: var(--gold-dim); }
+    @media (min-width: 860px) {
+      .tab { width: 100%; padding: 16px 22px; border: 0; border-radius: 0; margin-left: -1px; border-left: 2px solid transparent; font-size: 17px; }
+      .tab small { display: block; }
+      .tab[aria-selected="true"] { border-left-color: var(--gold); background: linear-gradient(90deg, var(--gold-dim), transparent); }
+    }
+    .panel[hidden] { display: none; }
+    .panel { animation: panelIn .45s ease; }
+    @keyframes panelIn { from { opacity: 0; transform: translateY(10px); } }
+    .panel h3 { font: 600 clamp(34px, 6vw, 48px)/1.05 var(--serif); }
+    .panel .lead { margin-top: 12px; color: var(--muted); font-size: 17px; max-width: 36em; }
+    .badge { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px; padding: 4px 12px; border-radius: 999px; font: 12px var(--mono); border: 1px solid var(--line); color: var(--muted); }
+    .badge.done { color: #8fd3ad; border-color: rgba(95, 191, 143, .35); }
+    .badge.wip { color: var(--gold); border-color: rgba(210, 174, 79, .4); }
+    .badge.wip::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--gold); animation: pulse 1.6s ease-in-out infinite; }
+    @keyframes pulse { 50% { opacity: .3; } }
+    .shot { display: block; margin-top: 28px; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; aspect-ratio: 16 / 10; }
     .shot img { width: 100%; height: 100%; object-fit: cover; object-position: top; transition: transform .6s; }
-    .card:hover .shot img { transform: scale(1.03); }
-    .body { display: flex; flex-direction: column; flex: 1; padding: 24px 26px 26px; }
-    .meta { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); }
-    .card h3 { font: 600 32px/1.1 'Cormorant Garamond', Georgia, serif; margin-top: 10px; }
-    .card p { margin-top: 8px; color: var(--muted); }
-    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
-    .tag { padding: 3px 10px; border-radius: 999px; background: var(--bg); font-size: 12px; color: var(--muted); }
-    .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 22px; }
+    .shot:hover img { transform: scale(1.02); }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+    .tag { padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; font: 12px var(--mono); color: var(--muted); }
+    .panel .actions { margin-top: 26px; }
+    .sub { margin-top: 34px; font: 12px var(--mono); color: var(--gold); letter-spacing: .04em; }
+    .plan { list-style: none; padding: 0; margin-top: 14px; display: grid; gap: 12px; }
+    .plan li { position: relative; padding: 18px 20px 18px 50px; border: 1px solid var(--line); border-radius: 16px; background: var(--bg-2); }
+    .plan li::before { content: '→'; position: absolute; left: 20px; top: 17px; color: var(--gold); font-family: var(--mono); }
+    .plan b { font-weight: 500; }
+    .plan span { display: block; color: var(--muted); font-size: 15px; }
+    .steps { list-style: none; padding: 0; margin-top: 16px; display: grid; gap: 0; border-left: 1px solid var(--line); margin-left: 7px; }
+    .steps li { position: relative; padding: 0 0 18px 26px; color: var(--muted); }
+    .steps li::before { content: ''; position: absolute; left: -7px; top: 6px; width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--bg); }
+    .steps li.ok { color: var(--ink); }
+    .steps li.ok::before { border-color: var(--forest-2); background: var(--forest-2); }
+    .steps li.now { color: var(--gold); }
+    .steps li.now::before { border-color: var(--gold); box-shadow: 0 0 0 4px var(--gold-dim); }
+    .steps li:last-child { padding-bottom: 0; }
 
-    .log { list-style: none; padding: 0; border-top: 1px solid var(--line); }
-    .log li { display: grid; grid-template-columns: 110px 1fr; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--line); }
-    .log time { color: var(--muted); font-size: 14px; }
-    .log b { font-weight: 500; }
-    .log span { color: var(--muted); }
+    .term { margin-top: 26px; border: 1px solid var(--line); border-radius: 18px; background: #0b100e; overflow: hidden; font: 14px/1.7 var(--mono); }
+    .term-bar { display: flex; align-items: center; gap: 7px; padding: 12px 16px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+    .term-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+    .term-bar i:first-child { background: var(--forest-2); }
+    .term-bar em { margin-left: 8px; font-style: normal; }
+    .term-body { padding: 20px 18px 24px; }
+    .term .cmd { color: var(--muted); }
+    .term .cmd b { color: var(--gold); font-weight: 400; }
+    .term ul { list-style: none; padding: 0; margin: 14px 0 18px; display: grid; gap: 16px; }
+    .term li { display: grid; grid-template-columns: 22px 1fr; }
+    .term li::before { content: '▸'; color: var(--forest-2); }
+    .term li b { color: var(--ink); font-weight: 500; }
+    .term li span { display: block; color: var(--muted); font-family: Inter, sans-serif; font-size: 15px; line-height: 1.6; }
+    .term .caret { display: inline-block; width: 8px; height: 1.1em; vertical-align: -3px; background: var(--gold); animation: blink 1.1s steps(1) infinite; }
 
-    footer { padding: 56px 0 72px; color: var(--muted); font-size: 14px; }
-    @media (max-width: 560px) {
-      .hero .wrap { padding-top: 64px; padding-bottom: 64px; }
-      .hero::after { background: rgba(13, 38, 32, .7); }
-      .log li { grid-template-columns: 1fr; gap: 2px; }
+    /* ---------- связь ---------- */
+    .contact h2 { font-size: clamp(44px, 9vw, 104px); max-width: 11em; }
+    .contact h2 em { font-style: italic; color: var(--gold); }
+    .links { display: grid; margin-top: 56px; border-top: 1px solid var(--line); }
+    @media (min-width: 720px) { .links { grid-template-columns: 1fr 1fr; column-gap: 40px; } }
+    .links a { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 76px; border-bottom: 1px solid var(--line); text-decoration: none; transition: color .2s, padding .3s; }
+    .links a:hover { color: var(--gold); padding-left: 8px; }
+    .links small { display: block; font: 11px var(--mono); color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+    .links strong { font-weight: 500; font-size: 17px; word-break: break-all; }
+    .links .arr { font-family: var(--mono); color: var(--muted); transition: transform .3s; }
+    .links a:hover .arr { transform: translate(3px, -3px); color: var(--gold); }
+
+    footer { padding: 40px 0 48px; border-top: 1px solid var(--line); color: var(--muted); font: 13px var(--mono); }
+    footer .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    footer svg { width: 28px; color: var(--gold); opacity: .7; }
+
+    /* ---------- появление при прокрутке ---------- */
+    .js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .8s ease, transform .8s ease; }
+    .js .reveal.in { opacity: 1; transform: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation: none !important; }
+      .js .reveal { transform: none; transition: opacity .3s; }
+      .panel { animation: none; }
     }
   </style>
 </head>
 <body>
-  <section class="hero">
-    <div class="wrap">
-      <p class="eyebrow">Портфолио</p>
-      <h1>Элтегин</h1>
-      <p class="lead">Делаю сайты и приложения, снимаю и монтирую короткие видео, автоматизирую рутину на Make.com — от идеи до работающего результата.</p>
-      <div class="chips">
-        <span class="chip">Сайты и приложения</span>
-        <span class="chip">Короткие видео</span>
-        <span class="chip">Автоматизация Make.com</span>
-      </div>
-      <div class="contacts">
-        <a class="pill primary" href="mailto:eltegin.zyrgalbek@gmail.com">Написать мне</a>
-        <a class="pill" href="https://github.com/AbuYaqinEltegin">GitHub</a>
-      </div>
+  <!-- приветствие -->
+  <div class="intro" id="intro" role="dialog" aria-label="Приветствие">
+    <div class="stage">
+      <div id="intro-orn"></div>
+      <p>Добро пожаловать.<span>Давайте сделаем что-то вместе</span></p>
     </div>
-  </section>
-
-  <div class="wrap">
-    <main>
-      <h2>Чем занимаюсь</h2>
-      <div class="services">
-        <article class="service" style="--accent: #1f4a38">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M9 9l-2 2 2 2M15 9l2 2-2 2"/></svg></div>
-          <h3>Сайты и приложения</h3>
-          <p>Лендинги, веб-приложения и PWA, которые ставятся на телефон. Запуск на своём домене.</p>
-        </article>
-        <article class="service" style="--accent: #b4566a">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10.5 9.5v5l4-2.5z"/></svg></div>
-          <h3>Короткие видео</h3>
-          <p>Ролики для Reels, Shorts и TikTok: сценарий, монтаж, субтитры и динамика, которая удерживает внимание.</p>
-        </article>
-        <article class="service" style="--accent: #9c7a22">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="2.5"/><circle cx="19" cy="6" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="M7.5 12c4 0 5-6 9-6M7.5 12c4 0 5 6 9 6"/></svg></div>
-          <h3>Автоматизация на Make.com</h3>
-          <p>Связываю сервисы между собой: заявки, таблицы, мессенджеры и CRM работают сами, без ручной рутины.</p>
-        </article>
-      </div>
-
-      <h2>Проекты</h2>
-      <div class="grid" id="projects"></div>
-
-      <h2>Журнал</h2>
-      <ul class="log" id="log"></ul>
-    </main>
-
-    <footer>© <span id="year"></span> Элтегин</footer>
+    <button class="skip" id="skip" type="button">пропустить →</button>
   </div>
 
-  <script>
-    // Новый проект — новый объект в начале списка. Картинка — в папку img/.
-    const projects = [
-      {
-        title: 'Калима',
-        date: '2026-10',
-        kind: 'Веб-приложение',
-        description: 'Карточки арабских слов с интервальным повторением: 18 колод, 390 слов, озвучка, тест и статистика. Работает офлайн и ставится на телефон.',
-        image: 'img/kalima.png',
-        tags: ['React', 'Vite', 'Tailwind', 'PWA'],
-        site: 'https://kalima-seven.vercel.app',
-        code: 'https://github.com/AbuYaqinEltegin/kalima',
-        learned: 'Алгоритм SM-2, PWA, деплой на Vercel',
-      },
-    ]
+  <header class="nav" id="nav">
+    <div class="wrap">
+      <a class="logo" href="#top">Элтегин<i>_</i></a>
+      <button class="burger" id="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="menu"><span></span></button>
+      <ul class="menu" id="menu">
+        <li><a href="#top"><small>01</small>главная</a></li>
+        <li><a href="#help"><small>02</small>помогу</a></li>
+        <li><a href="#path"><small>03</small>путь</a></li>
+        <li><a href="#contact"><small>04</small>связь</a></li>
+      </ul>
+    </div>
+  </header>
 
-    const months = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек']
-    const fmt = (d) => { const [y, m] = d.split('-'); return `${months[m - 1]} ${y}` }
-    const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+  <main id="top">
+    <section class="hero">
+      <div class="hero-orn" id="hero-orn"></div>
+      <div class="wrap">
+        <p class="kicker">// привет, я</p>
+        <h1>Элтегин</h1>
+        <p class="roles">сайты <b>·</b> автоматизация <b>·</b> короткие видео</p>
+        <p class="honest">Я в начале пути: учусь на реальных проектах и делаю их до конца — до работающей ссылки. Ищу первых заказчиков.</p>
+        <p class="status">Открыт к первым заказам</p>
+        <div class="actions">
+          <a class="btn gold" href="#path">Мой путь</a>
+          <a class="btn" href="#contact">Написать</a>
+        </div>
+      </div>
+      <span class="scroll-hint" aria-hidden="true"></span>
+    </section>
 
-    // code и site необязательны: у видео или сценария Make может не быть репозитория
-    document.getElementById('projects').innerHTML = projects.map((p) => `
-      <article class="card">
-        <a class="shot" href="${p.site ?? p.code}" target="_blank" rel="noopener"><img src="${p.image}" alt="${esc(p.title)}" loading="lazy"></a>
-        <div class="body">
-          <div class="meta"><span>${esc(p.kind)}</span><span>${fmt(p.date)}</span></div>
-          <h3>${esc(p.title)}</h3>
-          <p>${esc(p.description)}</p>
-          <div class="tags">${p.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div>
-          <div class="links">
-            ${p.site ? `<a class="pill primary" href="${p.site}" target="_blank" rel="noopener">${esc(p.siteLabel ?? 'Открыть сайт')}</a>` : ''}
-            ${p.code ? `<a class="pill" href="${p.code}" target="_blank" rel="noopener">Код на GitHub</a>` : ''}
+    <section class="block" id="help">
+      <div class="wrap">
+        <p class="label reveal">02 <span>/ чем могу помочь</span></p>
+        <h2 class="reveal">Что я делаю</h2>
+        <p class="intro-text reveal">Три направления, в которых я уже могу быть полезен. Берусь за небольшие задачи и честно говорю, если что-то пока за пределами моих сил.</p>
+        <div class="services reveal">
+          <article class="service">
+            <span class="num">/01</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M9.5 9 7.5 11l2 2M14.5 9l2 2-2 2"/></svg>
+            <h3>Сайты и приложения</h3>
+            <p>Лендинги и простые веб-приложения: адаптивные, быстрые, с публикацией в интернете. Пример — Калима.</p>
+          </article>
+          <article class="service">
+            <span class="num">/02</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="2.5"/><circle cx="19" cy="6" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="M7.5 12c4 0 5-6 9-6M7.5 12c4 0 5 6 9 6"/></svg>
+            <h3>Автоматизация на Make.com</h3>
+            <p>Связываю сервисы, чтобы рутина шла сама: заявка → таблица → письмо → уведомление в Telegram.</p>
+          </article>
+          <article class="service">
+            <span class="num">/03</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10.5 9.5v5l4-2.5z"/></svg>
+            <h3>Короткие видео</h3>
+            <p>Монтаж роликов для Reels, Shorts и TikTok: нарезка, субтитры, ритм, который удерживает внимание.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="path">
+      <div class="wrap">
+        <p class="label reveal">03 <span>/ мой путь</span></p>
+        <h2 class="reveal">Мой путь</h2>
+        <p class="intro-text reveal">Что уже сделано, что в работе и чему я сейчас учусь.</p>
+
+        <div class="path reveal">
+          <div class="tabs" role="tablist" aria-label="Мой путь">
+            <button class="tab" role="tab" id="t-kalima" aria-controls="p-kalima" aria-selected="true">Калима<small>готово · окт 2026</small></button>
+            <button class="tab" role="tab" id="t-kokjol" aria-controls="p-kokjol" aria-selected="false" tabindex="-1">Көк Жол<small>в работе</small></button>
+            <button class="tab" role="tab" id="t-study" aria-controls="p-study" aria-selected="false" tabindex="-1">Учёба<small>сейчас</small></button>
+          </div>
+
+          <div>
+            <article class="panel" role="tabpanel" id="p-kalima" aria-labelledby="t-kalima" tabindex="0">
+              <span class="badge done">✓ готово · октябрь 2026</span>
+              <h3>Калима</h3>
+              <p class="lead">Приложение для изучения арабских слов по карточкам. Само подсказывает, какие слова пора повторить, чтобы они не забывались.</p>
+              <a class="shot" href="https://kalima-seven.vercel.app" target="_blank" rel="noopener"><img src="img/kalima.png" alt="Главная страница Калимы" loading="lazy" width="1280" height="800"></a>
+              <ul class="plan">
+                <li><b>18 тем и 390 слов</b><span>С огласовками, транслитерацией и переводом.</span></li>
+                <li><b>Озвучка и интервальное повторение</b><span>Слово звучит при перевороте карточки; алгоритм SM-2 планирует повторения.</span></li>
+                <li><b>Работает как приложение</b><span>Ставится на телефон и открывается без интернета.</span></li>
+              </ul>
+              <div class="tags"><span class="tag">React</span><span class="tag">Vite</span><span class="tag">Tailwind</span><span class="tag">PWA</span><span class="tag">Vercel</span></div>
+              <div class="actions">
+                <a class="btn gold" href="https://kalima-seven.vercel.app" target="_blank" rel="noopener">Открыть сайт ↗</a>
+                <a class="btn" href="https://github.com/AbuYaqinEltegin/kalima" target="_blank" rel="noopener">Код на GitHub</a>
+              </div>
+            </article>
+
+            <article class="panel" role="tabpanel" id="p-kokjol" aria-labelledby="t-kokjol" tabindex="0" hidden>
+              <span class="badge wip">в работе · с октября 2026</span>
+              <h3>Көк Жол</h3>
+              <p class="lead">Демо-проект вымышленного тур-агентства по Кыргызстану. Цель — показать «бизнес в коробке»: сайт плюс автоматизация всей рутины агентства.</p>
+
+              <p class="sub">// что планирую сделать</p>
+              <ul class="plan">
+                <li><b>Двуязычный сайт (RU / EN)</b><span>Каталог и страницы туров, конструктор своего маршрута, бронирование, админ-панель.</span></li>
+                <li><b>ИИ-помощник</b><span>Подбирает тур по пожеланиям посетителя.</span></li>
+                <li><b>Автоматизации на Make.com</b><span>Заявка → CRM в Google Sheets → письмо клиенту → уведомление менеджеру в Telegram с кнопкой «подтвердить»; напоминания перед поездкой, отзыв после тура, отчёт владельцу раз в неделю.</span></li>
+              </ul>
+
+              <p class="sub">// где я сейчас</p>
+              <ul class="steps">
+                <li class="ok">Концепция</li>
+                <li class="ok">План проекта</li>
+                <li class="ok">Макет дизайна</li>
+                <li class="now">Разработка сайта — начинается</li>
+                <li>Автоматизации и ИИ-помощник</li>
+              </ul>
+
+              <p class="sub">// стек (план)</p>
+              <div class="tags"><span class="tag">Next.js</span><span class="tag">Tailwind</span><span class="tag">база данных</span><span class="tag">Vercel</span><span class="tag">Make.com</span></div>
+            </article>
+
+            <article class="panel" role="tabpanel" id="p-study" aria-labelledby="t-study" tabindex="0" hidden>
+              <span class="badge">октябрь 2026</span>
+              <h3>Учёба</h3>
+              <p class="lead">Учусь на практике: каждая новая тема сразу идёт в настоящий проект.</p>
+              <div class="term">
+                <div class="term-bar"><i></i><i></i><i></i><em>~/учёба</em></div>
+                <div class="term-body">
+                  <p class="cmd"><b>$</b> изучаю --сейчас</p>
+                  <ul>
+                    <li><div><b>Claude Code</b><span>Разработка вместе с ИИ-агентом: планирование, CLAUDE.md, git, деплой на Vercel. На нём сделаны Калима и это портфолио.</span></div></li>
+                    <li><div><b>Make.com</b><span>Автоматизация с нуля. Собрал первые рабочие сценарии: Google Sheets → Gmail, фильтры, подключение Telegram-бота.</span></div></li>
+                    <li><div><b>Веб-разработка</b><span>Через практику: React, Tailwind, PWA, GitHub.</span></div></li>
+                    <li><div><b>Арабский язык</b><span>Пригодился в Калиме — проверка огласовок и подбор слов.</span></div></li>
+                  </ul>
+                  <p class="cmd"><b>$</b> <span class="caret"></span></p>
+                </div>
+              </div>
+            </article>
           </div>
         </div>
-      </article>`).join('')
+      </div>
+    </section>
 
-    document.getElementById('log').innerHTML = projects.map((p) => `
-      <li><time>${fmt(p.date)}</time><div><b>${esc(p.title)}</b> — <span>${esc(p.learned)}</span></div></li>`).join('')
+    <section class="block contact" id="contact">
+      <div class="wrap">
+        <p class="label reveal">04 <span>/ связь</span></p>
+        <h2 class="reveal">Давайте сделаем что-то <em>вместе</em></h2>
+        <p class="intro-text reveal">Открыт к первым заказам — отвечу быстро. Напишите, что нужно сделать, и я честно скажу, смогу ли помочь.</p>
+        <div class="links reveal">
+          <a href="https://t.me/abu_yaqin" target="_blank" rel="noopener"><span><small>Telegram</small><strong>@abu_yaqin</strong></span><span class="arr">↗</span></a>
+          <a href="https://wa.me/996995091607" target="_blank" rel="noopener"><span><small>WhatsApp</small><strong>+996 995 091 607</strong></span><span class="arr">↗</span></a>
+          <a href="https://instagram.com/abuyaqin_eltegin" target="_blank" rel="noopener"><span><small>Instagram</small><strong>@abuyaqin_eltegin</strong></span><span class="arr">↗</span></a>
+          <a href="mailto:eltegin.zyrgalbek@gmail.com"><span><small>Email</small><strong>eltegin.zyrgalbek@gmail.com</strong></span><span class="arr">↗</span></a>
+          <a href="https://github.com/AbuYaqinEltegin" target="_blank" rel="noopener"><span><small>GitHub</small><strong>AbuYaqinEltegin</strong></span><span class="arr">↗</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
 
+  <footer>
+    <div class="wrap">
+      <span>© <span id="year"></span> Элтегин</span>
+      <span id="foot-orn"></span>
+    </div>
+  </footer>
+
+  <script>
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    // ---------- орнамент: розетка из «кочкор мүйүз» (бараньих рогов) и ромбов-тумаров ----------
+    const HORN = 'M0 0C0-26-9-44-25-50C-41-56-55-44-50-31C-46-21-33-23-33-32C-33-38-39-41-43-38M0 0C0-26 9-44 25-50C41-56 55-44 50-31C46-21 33-23 33-32C33-38 39-41 43-38'
+    const DIAMOND = (s) => `M0 ${-s}L${s * .7} 0 0 ${s}${-s * .7} 0Z`
+    // части: a — угол, r — расстояние от центра; центр (r = 0) растёт масштабом
+    const PARTS = [
+      ...Array.from({ length: 8 }, (_, i) => ({ a: i * 45, r: 50, d: HORN })),
+      ...Array.from({ length: 8 }, (_, i) => ({ a: i * 45 + 22.5, r: 150, d: DIAMOND(10) })),
+      { a: 0, r: 0, d: DIAMOND(28) + DIAMOND(12) },
+    ]
+    const rosette = (ring = true) =>
+      `<svg viewBox="-200 -200 400 400" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">` +
+      (ring ? '<circle class="ring" r="186" stroke-dasharray="1 10" stroke-width="2"/>' : '') +
+      PARTS.map((p) => `<g class="part" transform="rotate(${p.a}) translate(0 ${-p.r})"><path pathLength="1" d="${p.d}"/></g>`).join('') +
+      '</g></svg>'
+
+    document.getElementById('hero-orn').innerHTML = rosette()
+    document.getElementById('foot-orn').innerHTML = rosette(false)
     document.getElementById('year').textContent = new Date().getFullYear()
+
+    // ---------- приветствие ----------
+    const intro = document.getElementById('intro')
+    if (!document.documentElement.classList.contains('no-intro')) {
+      document.getElementById('intro-orn').innerHTML = rosette()
+      const nodes = [...intro.querySelectorAll('.part')]
+      const clamp = (x) => Math.min(1, Math.max(0, x))
+      const easeOut = (t) => 1 - (1 - t) ** 3
+      const easeIn = (t) => t * t * t
+      let raf, finished = false
+
+      // e — сборка (0→1), x — разлёт (0→1)
+      const place = (e, x) => nodes.forEach((n, i) => {
+        const p = PARTS[i]
+        const r = p.r ? p.r + 380 * (1 - e) + 520 * x : 0
+        const s = p.r ? 1 : e * (1 + 2 * x)
+        n.setAttribute('transform', `rotate(${p.a + 70 * (1 - e)}) translate(0 ${-r}) scale(${s})`)
+        n.style.opacity = e * (1 - x)
+        n.style.strokeDashoffset = 1 - e
+      })
+
+      const finish = (fast) => {
+        if (finished) return
+        finished = true
+        // при «пропустить» узор замирает; при обычном завершении разлёт доигрывает под гаснущим слоем
+        if (fast) cancelAnimationFrame(raf)
+        try { sessionStorage.setItem('introSeen', '1') } catch (e) {}
+        intro.classList.add('out')
+        setTimeout(() => intro.remove(), fast ? 350 : 520)
+      }
+
+      document.getElementById('skip').onclick = () => finish(true)
+      addEventListener('keydown', (e) => { if (e.key === 'Escape') finish(true) })
+      intro.classList.add('go')
+
+      if (reduce) {
+        // без полёта: узор и фраза просто появляются и гаснут
+        place(1, 0)
+        intro.classList.add('say')
+        setTimeout(() => finish(), 1100)
+      } else {
+        const t0 = performance.now()
+        const tick = (now) => {
+          const t = now - t0
+          const e = easeOut(clamp(t / 1150))
+          const x = easeIn(clamp((t - 1750) / 800))
+          place(e, x)
+          if (t > 1100) intro.classList.add('say')
+          if (t > 2050) finish()
+          if (t < 2600) raf = requestAnimationFrame(tick)
+        }
+        place(0, 0)
+        raf = requestAnimationFrame(tick)
+      }
+    }
+
+    // ---------- навигация ----------
+    const nav = document.getElementById('nav')
+    const burger = document.getElementById('burger')
+    burger.onclick = () => burger.setAttribute('aria-expanded', nav.classList.toggle('open'))
+    document.querySelectorAll('.menu a').forEach((a) => (a.onclick = () => { nav.classList.remove('open'); burger.setAttribute('aria-expanded', false) }))
+    const onScroll = () => nav.classList.toggle('scrolled', scrollY > 10)
+    addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+
+    // ---------- вкладки «Мой путь» ----------
+    const tabs = [...document.querySelectorAll('[role="tab"]')]
+    const select = (tab) => tabs.forEach((t) => {
+      const on = t === tab
+      t.setAttribute('aria-selected', on)
+      t.tabIndex = on ? 0 : -1
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on
+    })
+    tabs.forEach((t, i) => {
+      t.onclick = () => { select(t); t.scrollIntoView({ block: 'nearest', inline: 'center', behavior: reduce ? 'auto' : 'smooth' }) }
+      t.onkeydown = (e) => {
+        const k = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key]
+        if (!k) return
+        e.preventDefault()
+        const next = tabs[(i + k + tabs.length) % tabs.length]
+        select(next); next.focus()
+      }
+    })
+
+    // ---------- появление при прокрутке ----------
+    const io = new IntersectionObserver((entries) => entries.forEach((en) => {
+      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target) }
+    }), { rootMargin: '0px 0px -8% 0px' })
+    document.querySelectorAll('.reveal').forEach((el) => io.observe(el))
   </script>
 </body>
 </html>
