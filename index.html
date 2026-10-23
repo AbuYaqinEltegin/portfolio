@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Элтегин — проекты</title>
-  <meta name="description" content="Портфолио Элтегина: веб-приложения и сайты." />
+  <meta name="description" content="Элтегин: сайты и веб-приложения, короткие видео, автоматизация на Make.com." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%231f4a38'/><text x='32' y='44' font-size='34' text-anchor='middle' fill='%23c9a23a' font-family='Georgia,serif'>Э</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,28 +13,54 @@
     :root {
       --bg: #f3ece0; --surface: #faf5ec; --ink: #1d2a24; --muted: #6b6a60;
       --line: #ddd2bf; --gold: #9c7a22; --forest: #1f4a38; --forest-ink: #f3ece0;
+      --glow-a: rgba(201, 162, 58, .16); --glow-b: rgba(47, 156, 134, .12);
     }
     @media (prefers-color-scheme: dark) {
-      :root { --bg: #121a16; --surface: #18231e; --ink: #ece4d4; --muted: #9a9686; --line: #2c3a33; --gold: #d2ae4f; --forest: #1f4a38; }
+      :root { --bg: #121a16; --surface: #18231e; --ink: #ece4d4; --muted: #9a9686; --line: #2c3a33; --gold: #d2ae4f;
+        --glow-a: rgba(210, 174, 79, .08); --glow-b: rgba(47, 156, 134, .08); }
     }
     * { box-sizing: border-box; margin: 0; }
-    body { background: var(--bg); color: var(--ink); font: 16px/1.6 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    body {
+      background:
+        radial-gradient(900px 600px at 100% 40%, var(--glow-a), transparent 70%),
+        radial-gradient(800px 600px at 0% 85%, var(--glow-b), transparent 70%),
+        var(--bg);
+      color: var(--ink); font: 16px/1.6 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+    }
     a { color: inherit; }
-    .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px; }
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
 
-    header { padding: 72px 0 56px; border-bottom: 1px solid var(--line); }
-    .eyebrow { font-size: 12px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); }
-    h1 { font: 600 clamp(44px, 8vw, 72px)/1.02 'Cormorant Garamond', Georgia, serif; margin-top: 12px; }
-    .lead { max-width: 560px; margin-top: 16px; color: var(--muted); font-size: 18px; }
-    .contacts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+    /* шапка с картинкой */
+    .hero { position: relative; overflow: hidden; color: #f3ece0; background: #0d2620 url(img/hero-bg.svg) center / cover no-repeat; }
+    .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(13, 38, 32, .85) 0%, rgba(13, 38, 32, .35) 60%, transparent 100%); }
+    .hero .wrap { position: relative; z-index: 1; padding-top: 96px; padding-bottom: 96px; }
+    .eyebrow { font-size: 12px; letter-spacing: .3em; text-transform: uppercase; color: #d9a93f; }
+    h1 { font: 600 clamp(48px, 9vw, 84px)/1 'Cormorant Garamond', Georgia, serif; margin-top: 14px; }
+    .lead { max-width: 540px; margin-top: 18px; font-size: 18px; color: rgba(243, 236, 224, .78); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+    .chip { padding: 5px 14px; border: 1px solid rgba(217, 169, 63, .35); border-radius: 999px; font-size: 13px; color: #e8d3a0; background: rgba(13, 38, 32, .4); backdrop-filter: blur(6px); }
+    .contacts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+
     .pill { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); text-decoration: none; font-size: 14px; transition: border-color .2s, transform .2s; }
     .pill:hover { border-color: var(--gold); transform: translateY(-1px); }
     .pill.primary { background: var(--forest); color: var(--forest-ink); border-color: var(--forest); }
+    .hero .pill { background: rgba(243, 236, 224, .08); color: #f3ece0; border-color: rgba(243, 236, 224, .25); backdrop-filter: blur(6px); }
+    .hero .pill.primary { background: #d9a93f; color: #0d2620; border-color: #d9a93f; font-weight: 500; }
 
-    h2 { display: flex; align-items: center; gap: 16px; font: 600 28px 'Cormorant Garamond', Georgia, serif; margin: 56px 0 24px; }
+    h2 { display: flex; align-items: center; gap: 16px; font: 600 30px 'Cormorant Garamond', Georgia, serif; margin: 64px 0 24px; }
     h2::after { content: ''; flex: 1; height: 1px; background: var(--line); }
 
-    .grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); }
+    /* направления */
+    .services { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
+    .service { position: relative; overflow: hidden; padding: 28px 26px; border: 1px solid var(--line); border-radius: 24px; background: var(--surface); }
+    .service::before { content: ''; position: absolute; width: 180px; height: 180px; right: -60px; top: -60px; border-radius: 50%; background: var(--accent); opacity: .14; filter: blur(10px); }
+    .service .icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: var(--accent); color: #fff8ec; }
+    .service .icon svg { width: 24px; height: 24px; }
+    .service h3 { font: 600 26px/1.15 'Cormorant Garamond', Georgia, serif; margin-top: 18px; }
+    .service p { margin-top: 8px; color: var(--muted); font-size: 15px; }
+
+    /* проекты */
+    .grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); }
     .card { display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 24px; background: var(--surface); box-shadow: 0 10px 30px -18px rgba(40, 30, 10, .35); transition: transform .3s; }
     .card:hover { transform: translateY(-3px); }
     .shot { display: block; aspect-ratio: 16 / 10; overflow: hidden; border-bottom: 1px solid var(--line); background: var(--bg); }
@@ -56,24 +82,51 @@
 
     footer { padding: 56px 0 72px; color: var(--muted); font-size: 14px; }
     @media (max-width: 560px) {
-      header { padding: 48px 0 40px; }
+      .hero .wrap { padding-top: 64px; padding-bottom: 64px; }
+      .hero::after { background: rgba(13, 38, 32, .7); }
       .log li { grid-template-columns: 1fr; gap: 2px; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
+  <section class="hero">
+    <div class="wrap">
       <p class="eyebrow">Портфолио</p>
-      <h1>Элтегин — проекты</h1>
-      <p class="lead">Делаю веб-приложения и сайты: от идеи до работающей ссылки. Здесь — всё, что уже запущено.</p>
+      <h1>Элтегин</h1>
+      <p class="lead">Делаю сайты и приложения, снимаю и монтирую короткие видео, автоматизирую рутину на Make.com — от идеи до работающего результата.</p>
+      <div class="chips">
+        <span class="chip">Сайты и приложения</span>
+        <span class="chip">Короткие видео</span>
+        <span class="chip">Автоматизация Make.com</span>
+      </div>
       <div class="contacts">
         <a class="pill primary" href="mailto:eltegin.zyrgalbek@gmail.com">Написать мне</a>
         <a class="pill" href="https://github.com/AbuYaqinEltegin">GitHub</a>
       </div>
-    </header>
+    </div>
+  </section>
 
+  <div class="wrap">
     <main>
+      <h2>Чем занимаюсь</h2>
+      <div class="services">
+        <article class="service" style="--accent: #1f4a38">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M9 9l-2 2 2 2M15 9l2 2-2 2"/></svg></div>
+          <h3>Сайты и приложения</h3>
+          <p>Лендинги, веб-приложения и PWA, которые ставятся на телефон. Запуск на своём домене.</p>
+        </article>
+        <article class="service" style="--accent: #b4566a">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10.5 9.5v5l4-2.5z"/></svg></div>
+          <h3>Короткие видео</h3>
+          <p>Ролики для Reels, Shorts и TikTok: сценарий, монтаж, субтитры и динамика, которая удерживает внимание.</p>
+        </article>
+        <article class="service" style="--accent: #9c7a22">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="2.5"/><circle cx="19" cy="6" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="M7.5 12c4 0 5-6 9-6M7.5 12c4 0 5 6 9 6"/></svg></div>
+          <h3>Автоматизация на Make.com</h3>
+          <p>Связываю сервисы между собой: заявки, таблицы, мессенджеры и CRM работают сами, без ручной рутины.</p>
+        </article>
+      </div>
+
       <h2>Проекты</h2>
       <div class="grid" id="projects"></div>
 
@@ -104,17 +157,18 @@
     const fmt = (d) => { const [y, m] = d.split('-'); return `${months[m - 1]} ${y}` }
     const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 
+    // code и site необязательны: у видео или сценария Make может не быть репозитория
     document.getElementById('projects').innerHTML = projects.map((p) => `
       <article class="card">
-        <a class="shot" href="${p.site}" target="_blank" rel="noopener"><img src="${p.image}" alt="${esc(p.title)}" loading="lazy"></a>
+        <a class="shot" href="${p.site ?? p.code}" target="_blank" rel="noopener"><img src="${p.image}" alt="${esc(p.title)}" loading="lazy"></a>
         <div class="body">
           <div class="meta"><span>${esc(p.kind)}</span><span>${fmt(p.date)}</span></div>
           <h3>${esc(p.title)}</h3>
           <p>${esc(p.description)}</p>
           <div class="tags">${p.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div>
           <div class="links">
-            <a class="pill primary" href="${p.site}" target="_blank" rel="noopener">Открыть сайт</a>
-            <a class="pill" href="${p.code}" target="_blank" rel="noopener">Код на GitHub</a>
+            ${p.site ? `<a class="pill primary" href="${p.site}" target="_blank" rel="noopener">${esc(p.siteLabel ?? 'Открыть сайт')}</a>` : ''}
+            ${p.code ? `<a class="pill" href="${p.code}" target="_blank" rel="noopener">Код на GitHub</a>` : ''}
           </div>
         </div>
       </article>`).join('')
