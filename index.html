@@ -57,6 +57,9 @@
     .intro p { font: 700 clamp(18px, 4.2vw, 28px)/1.35 var(--sans); text-align: center; opacity: 0; transform: translateY(8px); transition: opacity .6s, transform .6s; }
     .intro p span { display: block; color: var(--gold); }
     .intro.say p { opacity: 1; transform: none; }
+    /* подложка и быстрое исчезновение: пока слой гаснет, фраза не ложится на всадников */
+    .intro p { padding: 12px 24px; border-radius: 18px; background: rgba(13, 16, 15, .82); text-shadow: 0 2px 12px rgba(0, 0, 0, .6); }
+    .intro.out p { opacity: 0; transition: opacity .2s; }
     .skip { position: absolute; right: 16px; bottom: 16px; min-height: 44px; padding: 0 18px; border: 1px solid var(--line); background: transparent; color: var(--muted); font: 13px var(--mono); cursor: pointer; }
     .skip:hover { color: var(--ink); border-color: var(--gold); }
 
@@ -155,9 +158,9 @@
     /* ---------- мой путь ---------- */
     .path { display: grid; gap: 36px; margin-top: clamp(48px, 7vw, 80px); }
     @media (min-width: 900px) { .path { grid-template-columns: 280px 1fr; gap: 64px; } }
-    .tabs { display: flex; gap: 28px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px 4px; }
-    .tabs::-webkit-scrollbar { display: none; }
-    @media (min-width: 900px) { .tabs { flex-direction: column; gap: 6px; margin: 0; padding: 0; align-self: start; position: sticky; top: 110px; } }
+    /* телефон: три вкладки поровну в один ряд — всё видно без прокрутки вбок */
+    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    @media (min-width: 900px) { .tabs { display: flex; flex-direction: column; gap: 6px; align-self: start; position: sticky; top: 110px; } }
     .tab { position: relative; flex: none; min-height: 48px; padding: 8px 26px 8px 0; border: 0; background: none; color: var(--muted); font: 800 clamp(20px, 2.2vw, 28px)/1.2 var(--sans); text-align: left; cursor: pointer; transition: color .2s; }
     .tab sup { position: absolute; right: 0; top: 6px; font: 500 12px var(--mono); }
     .tab small { display: block; margin-top: 4px; font: 500 12px var(--mono); color: var(--muted); }
@@ -167,6 +170,11 @@
       .tab { width: 100%; padding: 18px 0 18px 26px; border-left: 2px solid var(--line); }
       .tab sup { right: auto; left: 26px; top: 4px; }
       .tab[aria-selected="true"] { border-left-color: var(--gold); }
+    }
+    @media (max-width: 899px) {
+      .tab { padding: 12px 6px; border: 1px solid var(--line); border-radius: 14px; text-align: center; font-size: clamp(15px, 4.4vw, 20px); }
+      .tab sup { display: none; }
+      .tab[aria-selected="true"] { border-color: var(--gold); background: rgba(214, 176, 79, .08); }
     }
     .panel[hidden] { display: none; }
     .panel { animation: panelIn .45s ease; }
@@ -259,7 +267,6 @@
     html[lang="ar"] .hero h1 { line-height: 1.25; }
     [dir="rtl"] .menu a::before { margin: 0 0 0 .5em; }
     [dir="rtl"] .menu a sup, [dir="rtl"] .tab sup { right: auto; left: 0; }
-    [dir="rtl"] .tab { padding: 8px 0 8px 26px; text-align: right; }
     [dir="rtl"] .list li { padding: 0 26px 0 0; }
     [dir="rtl"] .list li::before { left: auto; right: 0; content: '←'; }
     [dir="rtl"] .term li { padding: 0 22px 0 0; }
